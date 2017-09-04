@@ -9,7 +9,7 @@
 import UIKit
 import Alamofire
 
-class BackendAlamofireExecutor: NSObject {
+class BackendAlamofireExecutor: NSObject, BackendExecutorProtocol {
 
     var dataTask : Request?
     
