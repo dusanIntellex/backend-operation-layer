@@ -183,3 +183,76 @@ finishOperation.addDependency(operation2)
 self.queue?.addOperations(operations: [operation, operation2, finishOperation])
 }
 ```
+
+## Load file
+
+To upload or download file, executor has predefined functions. To use this feature in Service class, we need to have pointer to FileLoadController. That will enable us to listen change on file we wanto to upload or download.
+**Download**
+```sh
+func downloadFile(fileName: String, fileType: String, fileExtension: String, finish: @escaping (_ file : FileLoad?) -> Void){
+// Create id for file to download it
+let fileId = "\(fileType)/\(fileName).\(fileExtension)"
+
+self.loadController = FileLoadController(fileId: fileId)
+let file = FileLoad.getFile(fileId: fileId, data: NSData())
+
+// Create operation
+let operation = BODownloadFile(fileId: fileId, path: fileType, name: fileName, fileExtension: fileExtension)
+operation.onSuccess = { (data, statusCode) in
+
+if data != nil{
+print(data!)
+}
+
+finish(file)
+}
+
+operation.onFailure = { (error, statusCode) in
+
+print(error?.localizedDescription as Any)
+finish(nil)
+}
+
+self.queue?.addOperation(operation: operation)
+
+// Track state of file
+loadController?.subscribeForFileUpload { (file) in
+print(file.progress)
+}
+}
+```
+
+**Upload**
+```sh
+func uploadFile(fileName: String, fileType: String, fileExtension: String, data: NSData, finish : @escaping FinishHandler){
+
+// Create controller for fileId
+self.loadController = FileLoadController(fileId: fileId)
+let file = FileLoad.getFile(fileId: fileId, data: data)
+
+// Create operation
+let operation = BOUploadFile(fileId: fileId, path: path, name: name, fileExtension: fExtens)
+operation.onSuccess = { (data, statusCode) in
+
+if data != nil{
+print(data!)
+}
+
+finish()
+}
+
+operation.onFailure = { (error, statusCode) in
+
+print(error?.localizedDescription as Any)
+finish()
+}
+
+self.queue?.addOperation(operation: operation)
+
+loadController?.subscribeForFileUpload { (file) in
+print(file.progress)
+}
+
+}
+```
+
