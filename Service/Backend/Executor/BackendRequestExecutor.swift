@@ -8,7 +8,7 @@
 
 import UIKit
 
-class BackendRequestExecutor: NSObject, URLSessionTaskDelegate {
+class BackendRequestExecutor: NSObject, URLSessionTaskDelegate, BackendExecutorProtocol {
     
     var session: URLSession?{
         

@@ -11,7 +11,7 @@ import Firebase
 import FirebaseDatabase
 import FirebaseStorage
 
-class BackendFirebaseExecutor: NSObject {
+class BackendFirebaseExecutor: NSObject, BackendExecutorProtocol {
     
     var ref: DatabaseReference?
     var storage =  Storage.storage()
