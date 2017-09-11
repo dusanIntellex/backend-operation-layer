@@ -22,7 +22,8 @@ class BaseModel: NSObject, Mappable {
             self.snapshoting(snapshot: value as Any)
         }
         else{
-            self.mapping(map: value as! Map)
+            let map = Map(mappingType: .fromJSON, JSON: value as! [String : Any])
+            self.mapping(map: map)
         }
     }
     
