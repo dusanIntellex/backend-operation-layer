@@ -49,4 +49,6 @@ protocol BackendRequest {
     ///
     /// - Returns: Bool value for tracking changes of observer model in Firebase
     func firebaseObserver() -> Bool?
+    
+    func encodingType() -> ParameterEncoding?
 }

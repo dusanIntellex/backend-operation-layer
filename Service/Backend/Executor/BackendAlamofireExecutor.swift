@@ -26,6 +26,7 @@ class BackendAlamofireExecutor: NSObject, BackendExecutorProtocol {
         let url = self.getUrl(backendRequest: backendRequest)
         let method = self.getMethod(backendRequest: backendRequest)
         let headers = self.getHeader(backendRequest: backendRequest)
+        let encodingType: ParameterEncoding = backendRequest.encodingType() != nil ? URLEncoding.httpBody : URLEncoding.queryString
         
         print("Service request:\nEndpoint:\(backendRequest.endpoint())\nHeaders:\(headers))\nParams:\(String(describing: backendRequest.paramteres()))")
         
