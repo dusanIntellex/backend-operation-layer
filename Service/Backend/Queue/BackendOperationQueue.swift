@@ -25,18 +25,10 @@ class BackendOperationQueue: NSObject {
     
     func addOperation(operation: BackendOperation){
         
-        if !Reachability.isConnectedToNetwork(){
-            print("ERROR - No internet connection")
-        }
-        
         self.queue?.addOperation(operation)
     }
     
     func addOperations(operations: [Operation]){
-        
-        if !Reachability.isConnectedToNetwork(){
-            print("ERROR - No internet connection")
-        }
         
         self.queue?.addOperations(operations, waitUntilFinished: false)
     }

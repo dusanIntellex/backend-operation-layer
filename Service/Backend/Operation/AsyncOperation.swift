@@ -12,7 +12,7 @@ class AsyncOperation: Operation {
     
     // MARK: - Properties
     private let stateQueue = DispatchQueue(
-        label: "rs.intellex.operation.state",
+        label: "rs.cd_ios_code.operation.state",
         attributes: .concurrent)
     
     private var rawState = OperationState.ready

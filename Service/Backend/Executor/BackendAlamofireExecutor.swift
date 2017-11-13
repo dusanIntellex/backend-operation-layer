@@ -26,6 +26,8 @@ class BackendAlamofireExecutor: NSObject, BackendExecutorProtocol {
         let url = self.getUrl(backendRequest: backendRequest)
         let method = self.getMethod(backendRequest: backendRequest)
         let headers = self.getHeader(backendRequest: backendRequest)
+        let encoding = self.getEncodingType(backendRequest: backendRequest)
+        
         let encodingType: ParameterEncoding = backendRequest.encodingType() != nil ? URLEncoding.httpBody : URLEncoding.queryString
         
         print("Service request:\nEndpoint:\(backendRequest.endpoint())\nHeaders:\(headers))\nParams:\(String(describing: backendRequest.paramteres()))")
@@ -255,10 +257,10 @@ class BackendAlamofireExecutor: NSObject, BackendExecutorProtocol {
     
         var header = HTTPHeaders()
         
-        // Common headers
-        header.updateValue("ios", forKey: "Client-Type")
-        header.updateValue("application/json", forKey: "Accept")
-        header.updateValue("application/json", forKey: "Content-Type")
+        // Set header for specific server
+        _ = COMMON_HEADERS.map{
+            request.setValue($0.value, forHTTPHeaderField: $0.key)
+        }
         
         // Custom headers
         if let headers = backendRequest.headers(){
@@ -270,6 +272,27 @@ class BackendAlamofireExecutor: NSObject, BackendExecutorProtocol {
         }
         
         return header
+    }
+    
+    private func getEncodingType(backendRequest: BackendRequest) -> ParameterEncoding{
+        
+        if let paramsEncodingType = backendRequest.encodingType(){
+            
+            switch paramsEncodingType{
+                
+            case .jsonBody:
+                return .httpBody
+                
+            case .multipartBodyURLEncode:
+                return .httpBody
+                
+            case .urlEncode:
+                break
+                
+            case .customBody:
+                break
+            }
+        }
     }
     
 }

@@ -39,6 +39,13 @@ class BackendOperation: AsyncOperation {
     
     override func execute() {
         
+        // Check connection
+        guard Reachability.isConnectedToNetwork() else{
+            self.finish()
+            // TODO: Handle internet connection
+            return
+        }
+        
         guard let type = request!.requestType()  else { rest(); return }
         
         switch type {
@@ -99,7 +106,7 @@ class BackendOperation: AsyncOperation {
         DispatchQueue.main.async {
             
             
-            // For any special handling of status code, do this here!!
+            // TODO: For any special handling of status code, do this here!!
             if self.onSuccess != nil{
                 
                 if statusCode == 200{

@@ -10,6 +10,8 @@ import Foundation
 
 #if DEBUG
     let SERVER_URL = ""
+    let COMMON_HEADERS = ["Client-Type" : "ios"]
 #else
     let SERVER_URL = ""
+    let COMMON_HEADERS = ["Client-Type" : "ios"]
 #endif

@@ -9,6 +9,7 @@
 import Foundation
 
 // Const
+let BRFileField = "file"
 let BRFileIdConst = "fileId"
 let BRDataConst = "data"
 let BRFileNameConst = "name"
@@ -19,6 +20,14 @@ enum RequestType {
     case rest
     case upload
     case download
+}
+
+enum ParametersEncodingType {
+    
+    case multipartBodyURLEncode
+    case urlEncode
+    case jsonBody
+    case customBody
 }
 
 enum HttpMethod : String{
@@ -50,5 +59,15 @@ protocol BackendRequest {
     /// - Returns: Bool value for tracking changes of observer model in Firebase
     func firebaseObserver() -> Bool?
     
-    func encodingType() -> ParameterEncoding?
+    
+    /// Type which define how will parameters be encoded
+    ///
+    /// - Returns: Enum values of enciding type
+    func encodingType() -> ParametersEncodingType?
+    
+    
+    /// If encoding Type is custom body, executor will use custom body for created request
+    ///
+    /// - Returns: Data
+    func createBody() -> Data?
 }

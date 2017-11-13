@@ -10,6 +10,7 @@ import UIKit
 
 class BackendRequestExecutor: NSObject, URLSessionTaskDelegate, BackendExecutorProtocol {
     
+    let timeoutInterval = 60.0
     var session: URLSession?{
         
         get{
@@ -44,12 +45,11 @@ class BackendRequestExecutor: NSObject, URLSessionTaskDelegate, BackendExecutorP
                 do{
                     let json = try JSONSerialization.jsonObject(with: data!, options: .allowFragments)
                     successCallback(json, statusCode)
-                    return;
                 }
                 catch{
                     successCallback(nil, statusCode)
-                    return;
                 }
+                return
             }
             
             if error != nil{
@@ -164,16 +164,16 @@ class BackendRequestExecutor: NSObject, URLSessionTaskDelegate, BackendExecutorP
         let urlString = SERVER_URL.appending(backendRequest.endpoint())
         let url = URL(string: urlString)
         
-        let request = NSMutableURLRequest(url: url!, cachePolicy: .reloadIgnoringLocalAndRemoteCacheData, timeoutInterval: 10.0)
+        let request = NSMutableURLRequest(url: url!, cachePolicy: .reloadIgnoringLocalAndRemoteCacheData, timeoutInterval: timeoutInterval)
         request.httpMethod = backendRequest.method().rawValue
         
         // Set header for specific server
-        request.setValue("application/json", forHTTPHeaderField: "Content-Type")
-        request.setValue("ios", forHTTPHeaderField: "Client-Type")
-        request.setValue("application/json", forHTTPHeaderField: "Accept")
+        _ = COMMON_HEADERS.map{
+            request.setValue($0.value, forHTTPHeaderField: $0.key)
+        }
         
         if let headers = backendRequest.headers(){
-        
+            
             for dict in headers {
                 
                 request.setValue(dict.value, forHTTPHeaderField: dict.key)
@@ -181,20 +181,56 @@ class BackendRequestExecutor: NSObject, URLSessionTaskDelegate, BackendExecutorP
         }
         
         // Set params
-        if let params = backendRequest.paramteres(){
+        if let encodingType = backendRequest.encodingType(), let params = backendRequest.paramteres(){
             
-            do{
-                let jsonParams = try JSONSerialization.data(withJSONObject: params, options: .prettyPrinted)
-                request.httpBody = jsonParams
+            switch encodingType{
+                
+            case .jsonBody:
+                do{
+                    let jsonParams = try JSONSerialization.data(withJSONObject: params, options: .prettyPrinted)
+                    request.httpBody = jsonParams
+                }
+                catch{
+                    print(error.localizedDescription)
+                }
+                break
+                
+            case .multipartBodyURLEncode:
+                
+                if let data = encodeUrlParams(request: backendRequest).data(using: .utf8){
+                    request.httpBody = data
+                }
+                else{
+                    print("Not able to create base64 data from params")
+                }
+                
+                break
+                
+            case .urlEncode:
+                let urlString = (request.url?.absoluteString)! + encodeUrlParams(request: backendRequest)
+                request.url = URL(string: urlString)
+                break
+                
+            case .customBody:
+                
+                break
             }
-            catch{
-                print(error.localizedDescription)
+            
+            if let params = backendRequest.paramteres(){
+                
+                do{
+                    let jsonParams = try JSONSerialization.data(withJSONObject: params, options: .prettyPrinted)
+                    request.httpBody = jsonParams
+                }
+                catch{
+                    print(error.localizedDescription)
+                }
             }
+            
+            print("\n\nService request:\nEndpoint:\(backendRequest.endpoint())\nHeaders:\(String(describing: request.allHTTPHeaderFields))\nParams:\(String(describing: backendRequest.paramteres()))")
+            
+            return request as URLRequest
         }
-        
-        print("\n\nService request:\nEndpoint:\(backendRequest.endpoint())\nHeaders:\(String(describing: request.allHTTPHeaderFields))\nParams:\(String(describing: backendRequest.paramteres()))")
-        
-        return request as URLRequest
     }
     
     
@@ -212,13 +248,32 @@ class BackendRequestExecutor: NSObject, URLSessionTaskDelegate, BackendExecutorP
         self.dataTask?.suspend()
     }
     
+    private func encodeUrlParams(request: BackendRequest) -> String{
+        
+        var urlParamsEncode = "?"
+        if let params = request.paramteres(){
+            
+            for (key, value) in params{
+                if urlParamsEncode.count > 1 { urlParamsEncode.append("&")}
+                urlParamsEncode.append(key)
+                urlParamsEncode.append("=")
+                urlParamsEncode.append(String(describing: value))
+            }
+        }
+        
+        let allowedCharacters = NSCharacterSet.urlQueryAllowed
+        if let encodedString = urlParamsEncode.addingPercentEncoding(withAllowedCharacters: allowedCharacters){
+            return encodedString
+        }
+        
+        return urlParamsEncode
+    }
 
-    // TODO: Track progress and file status!!
-    //MARK:- Session delegate
+    //MARK:- Session delegate for tracking upload progress
 
     func urlSession(_ session: URLSession, task: URLSessionTask, didSendBodyData bytesSent: Int64, totalBytesSent: Int64, totalBytesExpectedToSend: Int64) {
         let uploadProgress:Float = Float(totalBytesSent) / Float(totalBytesExpectedToSend)
-        print(uploadProgress)
+        print("\nBackend executor UploadProgres: \(uploadProgress)\n")
         
         if let file = self.loadFile {
             
