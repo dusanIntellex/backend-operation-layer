@@ -16,7 +16,7 @@ import UIKit
 
 class BackendOperation: AsyncOperation {
     
-    var executor: BackendFirebaseExecutor?
+    var executor: BackendRequestExecutor?
     var request: BackendRequest?
     
     var onSuccess: BackendRequestSuccessCallback?
@@ -27,7 +27,7 @@ class BackendOperation: AsyncOperation {
     override init() {
         super.init()
         
-        executor = BackendFirebaseExecutor()
+        executor = BackendRequestExecutor()
     }
     
     func isSingleton() -> Bool{

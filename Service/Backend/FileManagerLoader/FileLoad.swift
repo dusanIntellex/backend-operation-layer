@@ -32,12 +32,12 @@ public class FileLoad: NSObject {
     
     // MARK:- Properties
     
-    public dynamic var status: FileStatus = .pending
-    public dynamic var progress: CGFloat = 0.0
+    @objc public dynamic var status: FileStatus = .pending
+    @objc public dynamic var progress: CGFloat = 0.0
     public var fileId: String?
     
     public var path: URL?
-    public dynamic var uploadedPath: String?
+    @objc public dynamic var uploadedPath: String?
     public var type: String?
     public var mimeType: String?
     public var fileExtension: String?

@@ -28,11 +28,9 @@ class BackendAlamofireExecutor: NSObject, BackendExecutorProtocol {
         let headers = self.getHeader(backendRequest: backendRequest)
         let encoding = self.getEncodingType(backendRequest: backendRequest)
         
-        let encodingType: ParameterEncoding = backendRequest.encodingType() != nil ? URLEncoding.httpBody : URLEncoding.queryString
-        
         print("Service request:\nEndpoint:\(backendRequest.endpoint())\nHeaders:\(headers))\nParams:\(String(describing: backendRequest.paramteres()))")
         
-        dataTask = Alamofire.request(url, method: method, parameters: backendRequest.paramteres(), encoding: JSONEncoding.default, headers:headers).responseJSON { (response:DataResponse<Any>) in
+        dataTask = Alamofire.request(url, method: method, parameters: backendRequest.paramteres(), encoding:  encoding, headers:headers).responseJSON { (response:DataResponse<Any>) in
             
             let statusCode = response.response?.statusCode
             
@@ -259,7 +257,7 @@ class BackendAlamofireExecutor: NSObject, BackendExecutorProtocol {
         
         // Set header for specific server
         _ = COMMON_HEADERS.map{
-            request.setValue($0.value, forHTTPHeaderField: $0.key)
+            header.updateValue($0.value, forKey: $0.key)
         }
         
         // Custom headers
@@ -274,6 +272,11 @@ class BackendAlamofireExecutor: NSObject, BackendExecutorProtocol {
         return header
     }
     
+    
+    /// If there is not encoding type set, returns URLEncoding.httpBody
+    ///
+    /// - Parameter backendRequest: Backend request
+    /// - Returns: ParameterEncoding (Alamofire enum)
     private func getEncodingType(backendRequest: BackendRequest) -> ParameterEncoding{
         
         if let paramsEncodingType = backendRequest.encodingType(){
@@ -281,18 +284,19 @@ class BackendAlamofireExecutor: NSObject, BackendExecutorProtocol {
             switch paramsEncodingType{
                 
             case .jsonBody:
-                return .httpBody
+                return JSONEncoding.default
                 
             case .multipartBodyURLEncode:
-                return .httpBody
+                return URLEncoding.httpBody
                 
             case .urlEncode:
-                break
+                return URLEncoding.queryString
                 
             case .customBody:
-                break
+                return URLEncoding.httpBody
             }
         }
+        return URLEncoding.httpBody
     }
     
 }

@@ -212,25 +212,27 @@ class BackendRequestExecutor: NSObject, URLSessionTaskDelegate, BackendExecutorP
                 break
                 
             case .customBody:
-                
+                if let body = backendRequest.createBody(){
+                    request.httpBody = body
+                }
                 break
             }
-            
-            if let params = backendRequest.paramteres(){
-                
-                do{
-                    let jsonParams = try JSONSerialization.data(withJSONObject: params, options: .prettyPrinted)
-                    request.httpBody = jsonParams
-                }
-                catch{
-                    print(error.localizedDescription)
-                }
-            }
-            
-            print("\n\nService request:\nEndpoint:\(backendRequest.endpoint())\nHeaders:\(String(describing: request.allHTTPHeaderFields))\nParams:\(String(describing: backendRequest.paramteres()))")
-            
-            return request as URLRequest
         }
+            
+        if let params = backendRequest.paramteres(){
+            
+            do{
+                let jsonParams = try JSONSerialization.data(withJSONObject: params, options: .prettyPrinted)
+                request.httpBody = jsonParams
+            }
+            catch{
+                print(error.localizedDescription)
+            }
+        }
+        
+        print("\n\nService request:\nEndpoint:\(backendRequest.endpoint())\nHeaders:\(String(describing: request.allHTTPHeaderFields))\nParams:\(String(describing: backendRequest.paramteres()))")
+        
+        return request as URLRequest
     }
     
     
