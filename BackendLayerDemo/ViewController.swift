@@ -40,9 +40,9 @@ class ViewController: UIViewController , UIImagePickerControllerDelegate, UINavi
     
     @IBAction func downloadAction(_ sender: UIButton) {
         
-        ServiceRegister.sharedInstance.example.downloadFile(response: { (succes) in
-            if succes{
-                let alert = UIAlertController(title: "Success", message: "File successfuly downloaded", preferredStyle: UIAlertControllerStyle.alert)
+        ServiceRegister.sharedInstance.example.downloadFile(response: { (downloadedFile) in
+            if downloadedFile != nil{
+                let alert = UIAlertController(title: "Success", message: "File successfuly downloaded. You can find it on url: \(downloadedFile?.path?.absoluteString ?? "")", preferredStyle: UIAlertControllerStyle.alert)
                 alert.addAction(UIAlertAction(title: "OK", style: UIAlertActionStyle.cancel, handler: nil))
                 self.present(alert, animated: true, completion: nil)
             }

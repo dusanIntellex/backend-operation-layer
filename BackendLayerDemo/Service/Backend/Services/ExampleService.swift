@@ -34,14 +34,14 @@ class ExampleService: BackendService {
         self.queue?.addOperation(operation: operation)
     }
     
-    func downloadFile(response: @escaping SuccessCallback, progress: @escaping (_ file : FileLoad) -> Void){
+    func downloadFile(response: @escaping (_ responseFile: FileLoad?) -> Void, progress: @escaping (_ file : FileLoad) -> Void){
 
         let operation = BODownloadExample()
         
         operation.onSuccess = {(file, status) in
             
             self.fileController?.unsubscribe(fileId: (operation.request as? DownloadFileProtocol)?.downloadFileId() ?? "", removeFromPool: true)
-            response(((file as? FileLoad) != nil))
+            response(file as? FileLoad)
         }
         
         operation.onFailure = {(error, status) in
@@ -50,7 +50,7 @@ class ExampleService: BackendService {
             alert.addAction(UIAlertAction(title: "OK", style: UIAlertActionStyle.cancel, handler: nil))
             UIApplication.topViewController().present(alert, animated: true, completion: nil)
             self.fileController?.unsubscribe(fileId: (operation.request as? DownloadFileProtocol)?.downloadFileId() ?? "", removeFromPool: true)
-            response(false)
+            response(nil)
         }
         
         self.queue?.addOperation(operation: operation)
