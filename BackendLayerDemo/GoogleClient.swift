@@ -49,7 +49,6 @@ class GoogleClient: NSObject, GIDSignInDelegate, GIDSignInUIDelegate  {
             }
         }
         
-        GoogleClient.sharedInstance.success = nil
     }
     
     
