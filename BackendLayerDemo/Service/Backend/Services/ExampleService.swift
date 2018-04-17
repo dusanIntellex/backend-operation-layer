@@ -34,20 +34,13 @@ class ExampleService: BackendService {
         self.queue?.addOperation(operation: operation)
     }
     
-    
-    func uploadFile(file: FileLoad, response: @escaping SuccessCallback){
-        
-//        let operation = BOUploadExample()
-
-    }
-    
     func downloadFile(response: @escaping SuccessCallback, progress: @escaping (_ file : FileLoad) -> Void){
 
         let operation = BODownloadExample()
         
         operation.onSuccess = {(file, status) in
             
-            self.fileController?.unsubscribe(fileId: (operation.request as? DownloadFileProtocol)?.downloadFileId() ?? "")
+            self.fileController?.unsubscribe(fileId: (operation.request as? DownloadFileProtocol)?.downloadFileId() ?? "", removeFromPool: true)
             response(((file as? FileLoad) != nil))
         }
         
@@ -56,7 +49,7 @@ class ExampleService: BackendService {
             let alert = UIAlertController(title: "Error", message: error?.localizedDescription, preferredStyle: UIAlertControllerStyle.alert)
             alert.addAction(UIAlertAction(title: "OK", style: UIAlertActionStyle.cancel, handler: nil))
             UIApplication.topViewController().present(alert, animated: true, completion: nil)
-            self.fileController?.unsubscribe(fileId: (operation.request as? DownloadFileProtocol)?.downloadFileId() ?? "")
+            self.fileController?.unsubscribe(fileId: (operation.request as? DownloadFileProtocol)?.downloadFileId() ?? "", removeFromPool: true)
             response(false)
         }
         
@@ -69,16 +62,24 @@ class ExampleService: BackendService {
         }
     }
     
-    func uploadFile(file: FileLoad, response: @escaping SuccessCallback,  progress: @escaping (_ file : FileLoad) -> Void){
+    func uploadFile(uploadFile: FileLoad, response: @escaping SuccessCallback,  progress: @escaping (_ file : FileLoad) -> Void){
         
-        GoogleClient.authorize { (success) in
-            
+        GoogleClient.authorize { [unowned self] (success) in
+
             if success{
-                let operation = BOUploadExample(file: file)
+
+                // Track progress
+                self.fileController = FileLoadController.init(fileId: uploadFile.fileId ?? "")
+                self.fileController?.subscribeForFileUpload { (file) in
+                    progress(file)
+                }
                 
-                operation.onSuccess = {(file, status) in
+                
+                let operation = BOUploadExample(file: uploadFile)
+                
+                operation.onSuccess = {(json, status) in
                     
-                    self.fileController?.unsubscribe(fileId: (operation.request as? DownloadFileProtocol)?.downloadFileId() ?? "")
+                    self.fileController?.unsubscribe(fileId: uploadFile.fileId ?? "", removeFromPool: true)
                     response(true)
                 }
                 
@@ -87,18 +88,14 @@ class ExampleService: BackendService {
                     let alert = UIAlertController(title: "Error", message: error?.localizedDescription, preferredStyle: UIAlertControllerStyle.alert)
                     alert.addAction(UIAlertAction(title: "OK", style: UIAlertActionStyle.cancel, handler: nil))
                     UIApplication.topViewController().present(alert, animated: true, completion: nil)
-                    self.fileController?.unsubscribe(fileId: (operation.request as? DownloadFileProtocol)?.downloadFileId() ?? "")
+                    self.fileController?.unsubscribe(fileId: uploadFile.fileId ?? "", removeFromPool: true)
                     response(false)
                 }
                 
                 self.queue?.addOperation(operation: operation)
-                
-                // Track progress
-                self.fileController = FileLoadController.init(fileId: file.fileId ?? "")
-                self.fileController?.subscribeForFileUpload { (file) in
-                    progress(file)
-                }
             }
+            
+            
         }
     }
 }

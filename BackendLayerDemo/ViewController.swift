@@ -90,7 +90,7 @@ class ViewController: UIViewController , UIImagePickerControllerDelegate, UINavi
     
     func uploadFile(file: FileLoad){
         
-        ServiceRegister.sharedInstance.example.uploadFile(file: file, response: { (success) in
+        ServiceRegister.sharedInstance.example.uploadFile(uploadFile: file, response: { (success) in
             
             if success{
                 let alert = UIAlertController(title: "Success", message: "File successfuly uploaded", preferredStyle: UIAlertControllerStyle.alert)

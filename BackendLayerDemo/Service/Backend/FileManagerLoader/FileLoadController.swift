@@ -48,11 +48,19 @@ public class FileLoadController: NSObject {
         }
     }
     
-    public func unsubscribe(fileId: String){
+    public func unsubscribe(fileId: String, removeFromPool: Bool){
         
         for path in addedKeyPaths{
             
             file?.removeObserver(self, forKeyPath: path as! String)
+            
+            if removeFromPool{
+                FilesPool.sharedInstance.pool?.enumerated().forEach{
+                    if $0.element.fileId == file?.fileId{
+                        FilesPool.sharedInstance.pool?.remove(at: $0.offset)
+                    }
+                }
+            }
         }
         
         addedKeyPaths.removeAll()

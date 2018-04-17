@@ -61,6 +61,15 @@ public class FileLoad: NSObject {
         FilesPool.sharedInstance.pool?.append(self)
     }
     
+    deinit {
+        FilesPool.sharedInstance.pool?.enumerated().forEach{
+            if $0.element.fileId == self.fileId{
+                FilesPool.sharedInstance.pool?.remove(at: $0.offset)
+                return
+            }
+        }
+    }
+    
     /// Return file with id from pool array. If not exsist create new file
     ///
     /// - Parameter fileId: unique file id

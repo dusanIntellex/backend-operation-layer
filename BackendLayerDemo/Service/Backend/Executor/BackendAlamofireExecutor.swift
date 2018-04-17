@@ -74,7 +74,7 @@ class BackendAlamofireExecutor: NSObject, BackendExecutorProtocol {
             return
         }
         
-        let file = FileLoad(fileId: fileId)
+        let file = FileLoad.getFile(fileId: fileId, data: nil)
         let url = self.getUrl(backendRequest: backendRequest)
         let method = self.getMethod(backendRequest: backendRequest)
         let headers = self.getHeader(backendRequest: backendRequest)
@@ -96,7 +96,6 @@ class BackendAlamofireExecutor: NSObject, BackendExecutorProtocol {
                 file.progress = CGFloat(progress.fractionCompleted)
                 
             }).responseString { response in
-                debugPrint(response)
                 
                 file.status = response.result.isSuccess ? .success : .fail
                 
@@ -106,8 +105,9 @@ class BackendAlamofireExecutor: NSObject, BackendExecutorProtocol {
                     successCallback(file, (response.response?.statusCode)!)
                     
                 } else {
-                    
-                    print("error downloading file - \(String(describing: response.error?.localizedDescription))")
+                    if _isDebugAssertConfiguration(){
+                        print("error downloading file - \(String(describing: response.error?.localizedDescription))")
+                    }
                     failureCallback(response.result.error, response.response?.statusCode ?? -1001)
                 }
         }
@@ -133,8 +133,7 @@ class BackendAlamofireExecutor: NSObject, BackendExecutorProtocol {
         
         let url = self.getUrl(backendRequest: backendRequest)
         let method = self.getMethod(backendRequest: backendRequest)
-        var headers = backendRequest.headers()
-        headers!["Content-Type"] = "multipart/form-data"
+        let headers = backendRequest.headers()
         let encoding = self.getEncodingType(backendRequest: backendRequest)
         let params = backendRequest.paramteres()
         var mainRequest: URLRequest?
@@ -150,27 +149,45 @@ class BackendAlamofireExecutor: NSObject, BackendExecutorProtocol {
             return
         }
         
+    
+        Alamofire.upload(file.data!, to: url, method: method, headers: headers)
+            .uploadProgress { (progress) in
+                
+                file.status = .progress
+                file.progress = CGFloat(progress.fractionCompleted)
+            }
+            .responseString { (response) in
+                
+                file.status = response.result.isSuccess ? .success : .fail
+                
+                // If success
+                if response.result.isSuccess{
+                    
+                    successCallback(file, (response.response?.statusCode)!)
+                    
+                } else {
+                    if _isDebugAssertConfiguration(){
+                        print("error downloading file - \(String(describing: response.error?.localizedDescription))")
+                    }
+                    failureCallback(response.result.error, response.response?.statusCode ?? -1001)
+                }
+        }
         
+        /*
+            
         Alamofire.upload(multipartFormData: { (multipartFormData) in
             
-            guard let url = file.path else{
+            guard file.data != nil else{
                 if _isDebugAssertConfiguration(){
-                    print("Upload file doens't have url path")
+                    print("Upload file is empty")
                 }
                 failureCallback(nil, 1001)
                 return
             }
             
-            do{
-                let data = try Data(contentsOf: url)
-                let mime = "\(file.type ?? "image")/\(file.fileExtension ?? "jpg")"
-                multipartFormData.append(data, withName: file.type ?? "image", fileName: "\(file.name ?? "image").\(file.fileExtension ?? "jpg")", mimeType: mime)
-            }
-            catch{
-                print("No data on file path url")
-                failureCallback(nil, 1001)
-                return
-            }
+            let mime = "\(file.type ?? "image")/\(file.fileExtension ?? "jpg")"
+            multipartFormData.append(file.data!, withName: file.type ?? "image", fileName: "\(file.name ?? "image").\(file.fileExtension ?? "jpg")", mimeType: mime)
+            
             
         }, usingThreshold: UInt64.init(), with: mainRequest!) { (result) in
             
@@ -193,6 +210,7 @@ class BackendAlamofireExecutor: NSObject, BackendExecutorProtocol {
                 failureCallback(error as NSError, 400)
             }
         }
+         */
     }
     
     

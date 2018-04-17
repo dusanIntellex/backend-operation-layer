@@ -17,6 +17,8 @@ class GoogleClient: NSObject, GIDSignInDelegate, GIDSignInUIDelegate  {
     
     static func authorize(successHandler: @escaping SuccessCallback){
         
+        sharedInstance.success = successHandler
+        
         // GoogleSignIn
         GIDSignIn.sharedInstance().clientID = "408860784888-bd9m1hfdaobl149ufdohe3qhpds4mvit.apps.googleusercontent.com"
         
@@ -26,8 +28,6 @@ class GoogleClient: NSObject, GIDSignInDelegate, GIDSignInUIDelegate  {
         
         GIDSignIn.sharedInstance().scopes = ["https://www.googleapis.com/auth/drive"]
         GIDSignIn.sharedInstance().signIn()
-        
-        sharedInstance.success = successHandler
     }
     
     static func logout(){
@@ -48,6 +48,8 @@ class GoogleClient: NSObject, GIDSignInDelegate, GIDSignInUIDelegate  {
                 GoogleClient.sharedInstance.success!(false)
             }
         }
+        
+        GoogleClient.sharedInstance.success = nil
     }
     
     

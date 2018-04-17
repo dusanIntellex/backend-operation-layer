@@ -112,7 +112,6 @@ class BackendRequestExecutor: NSObject, URLSessionTaskDelegate,URLSessionDelegat
         self.dataTask = self.session?.uploadTask(with: request, from: file.data!)
         self.dataTask?.resume()
     }
-
     
     func requestWithBackendRequest(backendRequest: BackendRequest) -> URLRequest{
         
