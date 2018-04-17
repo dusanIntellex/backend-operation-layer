@@ -44,6 +44,7 @@ public class FileLoad: NSObject {
     public var metaData: NSDictionary?
     public var size: NSInteger?
     public var name: String?
+    public var data: Data?
 //    public var process: UploadRequest?
     
     // MARK:- Constructor

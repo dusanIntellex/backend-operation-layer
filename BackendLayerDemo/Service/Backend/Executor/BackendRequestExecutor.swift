@@ -98,36 +98,18 @@ class BackendRequestExecutor: NSObject, URLSessionTaskDelegate,URLSessionDelegat
     ///   - failureCallback: Return error and stts code
     func uploadFile(backendRequest: BackendRequest, successCallback: @escaping BackendRequestSuccessCallback, failureCallback: @escaping BackendRequestFailureCallback) {
         
-        guard let fileId = backendRequest.paramteres()?[BRFileIdConst] else {
+        guard let file = (backendRequest as? UploadFileProtocol)?.uploadFile() else {
+            if _isDebugAssertConfiguration(){
+                print("You have not set file id within request. Backend request: \(backendRequest.endpoint()) need to implement Download File protocol")
+            }
             failureCallback(nil, 1001)
             return
         }
         
         let request = self.requestWithBackendRequest(backendRequest: backendRequest)
         
-        // File located on disk
-        let file = FileLoad.getFile(fileId: fileId as! String, data: nil)
         self.loadFile = file
-        
-        self.dataTask = session?.uploadTask(with: request, fromFile: file.path!, completionHandler: { (data, response, error) in
-            
-            if response == nil{
-                failureCallback(nil, 1001)
-                return;
-            }
-            
-            let statusCode = (response as? HTTPURLResponse)?.statusCode
-            
-            if response != nil, error == nil {
-                
-                successCallback(response, statusCode!)
-                
-            } else {
-                print("Failure: %@", error?.localizedDescription as Any);
-                failureCallback(error, statusCode!)
-            }
-        })
-        
+        self.dataTask = self.session?.uploadTask(with: request, from: file.data!)
         self.dataTask?.resume()
     }
 
@@ -248,7 +230,7 @@ class BackendRequestExecutor: NSObject, URLSessionTaskDelegate,URLSessionDelegat
 
     func urlSession(_ session: URLSession, task: URLSessionTask, didSendBodyData bytesSent: Int64, totalBytesSent: Int64, totalBytesExpectedToSend: Int64) {
         let uploadProgress:Float = Float(totalBytesSent) / Float(totalBytesExpectedToSend)
-        print("\nBackend executor UploadProgres: \(uploadProgress)\n")
+        print("\nBackend executor Upload Progres: \(uploadProgress)\n")
         
         if let file = self.loadFile {
             
@@ -260,7 +242,7 @@ class BackendRequestExecutor: NSObject, URLSessionTaskDelegate,URLSessionDelegat
     func urlSession(_ session: URLSession, downloadTask: URLSessionDownloadTask, didWriteData bytesWritten: Int64, totalBytesWritten: Int64, totalBytesExpectedToWrite: Int64) {
         
         let downloadProgress:Float = Float(totalBytesWritten) / Float(totalBytesExpectedToWrite)
-        print("\nBackend executor UploadProgres: \(downloadProgress)\n")
+        print("\nBackend executor Download Progres: \(downloadProgress)\n")
         
         if let file = self.loadFile {
             

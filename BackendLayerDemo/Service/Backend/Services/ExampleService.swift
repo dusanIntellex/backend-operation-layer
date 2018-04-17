@@ -68,4 +68,37 @@ class ExampleService: BackendService {
             progress(file)
         }
     }
+    
+    func uploadFile(file: FileLoad, response: @escaping SuccessCallback,  progress: @escaping (_ file : FileLoad) -> Void){
+        
+        GoogleClient.authorize { (success) in
+            
+            if success{
+                let operation = BOUploadExample(file: file)
+                
+                operation.onSuccess = {(file, status) in
+                    
+                    self.fileController?.unsubscribe(fileId: (operation.request as? DownloadFileProtocol)?.downloadFileId() ?? "")
+                    response(true)
+                }
+                
+                operation.onFailure = {(error, status) in
+                    
+                    let alert = UIAlertController(title: "Error", message: error?.localizedDescription, preferredStyle: UIAlertControllerStyle.alert)
+                    alert.addAction(UIAlertAction(title: "OK", style: UIAlertActionStyle.cancel, handler: nil))
+                    UIApplication.topViewController().present(alert, animated: true, completion: nil)
+                    self.fileController?.unsubscribe(fileId: (operation.request as? DownloadFileProtocol)?.downloadFileId() ?? "")
+                    response(false)
+                }
+                
+                self.queue?.addOperation(operation: operation)
+                
+                // Track progress
+                self.fileController = FileLoadController.init(fileId: file.fileId ?? "")
+                self.fileController?.subscribeForFileUpload { (file) in
+                    progress(file)
+                }
+            }
+        }
+    }
 }

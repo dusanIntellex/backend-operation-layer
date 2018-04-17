@@ -15,7 +15,7 @@ class BRDownloadExample: NSObject, BackendRequest, DownloadFileProtocol {
     
     
     func endpoint() -> String {
-        return "http://trailers.divx.com/divx_prod/profiles/Helicopter_DivXHT_ASP.divx"
+        return "http://ipv4.download.thinkbroadband.com/5MB.zip" 
     }
     
     func method() -> HttpMethod {
