@@ -61,6 +61,7 @@
 		184B88AF2076374B00C77A77 /* Typedefs.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Typedefs.swift; sourceTree = "<group>"; };
 		184B88B02076374B00C77A77 /* BackendConstants.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BackendConstants.swift; sourceTree = "<group>"; };
 		184B88B12076374B00C77A77 /* Reachibility.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Reachibility.swift; sourceTree = "<group>"; };
+		185148A02087376B0051C1E8 /* BackendLayerDemo.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = BackendLayerDemo.entitlements; sourceTree = "<group>"; };
 		185D4A552084CB3A0002C9F7 /* BRUploadExample.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BRUploadExample.swift; sourceTree = "<group>"; };
 		185D4A572084D3080002C9F7 /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
 		185D4A592084D5770002C9F7 /* GoogleClient.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = GoogleClient.swift; sourceTree = "<group>"; };
@@ -217,6 +218,7 @@
 		18F9CF941FB9C15F0015CD27 /* BackendLayerDemo */ = {
 			isa = PBXGroup;
 			children = (
+				185148A02087376B0051C1E8 /* BackendLayerDemo.entitlements */,
 				184B88992076374B00C77A77 /* Service */,
 				18F9CF951FB9C15F0015CD27 /* AppDelegate.swift */,
 				185D4A592084D5770002C9F7 /* GoogleClient.swift */,
@@ -283,6 +285,14 @@
 					18F9CF911FB9C15F0015CD27 = {
 						CreatedOnToolsVersion = 9.1;
 						ProvisioningStyle = Automatic;
+						SystemCapabilities = {
+							com.apple.BackgroundModes = {
+								enabled = 1;
+							};
+							com.apple.Push = {
+								enabled = 1;
+							};
+						};
 					};
 				};
 			};
@@ -553,6 +563,7 @@
 			baseConfigurationReference = C5344954B9CC1BEDD1AD3EC0 /* Pods-BackendLayerDemo.debug.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_ENTITLEMENTS = BackendLayerDemo/BackendLayerDemo.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = KUV6SQ5946;
 				INFOPLIST_FILE = BackendLayerDemo/Info.plist;
@@ -570,6 +581,7 @@
 			baseConfigurationReference = 5BA33595D38E17ADBFFE7DE7 /* Pods-BackendLayerDemo.release.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_ENTITLEMENTS = BackendLayerDemo/BackendLayerDemo.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = KUV6SQ5946;
 				INFOPLIST_FILE = BackendLayerDemo/Info.plist;

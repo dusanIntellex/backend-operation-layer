@@ -7,6 +7,7 @@
 //
 
 import UIKit
+import UserNotifications
 
 class ViewController: UIViewController , UIImagePickerControllerDelegate, UINavigationControllerDelegate{
     
@@ -16,7 +17,7 @@ class ViewController: UIViewController , UIImagePickerControllerDelegate, UINavi
         super.viewDidLoad()
         // Do any additional setup after loading the view, typically from a nib.
         
-        
+        registerForNotifications()
     }
 
     override func didReceiveMemoryWarning() {
@@ -42,33 +43,37 @@ class ViewController: UIViewController , UIImagePickerControllerDelegate, UINavi
         
         ServiceRegister.sharedInstance.example.downloadFile(response: { (downloadedFile) in
             if downloadedFile != nil{
-                let alert = UIAlertController(title: "Success", message: "File successfuly downloaded. You can find it on url: \(downloadedFile?.path?.absoluteString ?? "")", preferredStyle: UIAlertControllerStyle.alert)
+                let alert = UIAlertController(title: "Success", message: "File successfuly downloaded.\nYou can find it on url: \(downloadedFile?.path?.absoluteString ?? "")", preferredStyle: UIAlertControllerStyle.alert)
                 alert.addAction(UIAlertAction(title: "OK", style: UIAlertActionStyle.cancel, handler: nil))
                 self.present(alert, animated: true, completion: nil)
+                
+//                if let delegate = UIApplication.shared.delegate as? AppDelegate{
+//                    delegate.postNotification()
+//                }
             }
         }) { (file) in
             
-            self.loadProgressLabel.text = "\(Double(round(100*file.progress))/100)"
-            
-            switch file.status{
-            case .pending:
-                self.loadProgressLabel.textColor = UIColor.lightGray
-                break
-            case .fail:
-                self.loadProgressLabel.textColor = UIColor.red
-                break
-            case .success:
-                self.loadProgressLabel.textColor = UIColor.green
-                break
-            case .progress:
-                self.loadProgressLabel.textColor = UIColor.blue
-                break
-            default:
-                self.loadProgressLabel.textColor = UIColor.gray
-                break
+            DispatchQueue.main.async {
+                self.loadProgressLabel.text = "\(Double(round(100*file.progress))/100)"
+                
+                switch file.status{
+                case .pending:
+                    self.loadProgressLabel.textColor = UIColor.lightGray
+                    break
+                case .fail:
+                    self.loadProgressLabel.textColor = UIColor.red
+                    break
+                case .success:
+                    self.loadProgressLabel.textColor = UIColor.green
+                    break
+                case .progress:
+                    self.loadProgressLabel.textColor = UIColor.blue
+                    break
+                default:
+                    self.loadProgressLabel.textColor = UIColor.gray
+                    break
+                }
             }
-            
-            
         }
     }
     
@@ -100,24 +105,26 @@ class ViewController: UIViewController , UIImagePickerControllerDelegate, UINavi
             
         }) { (file) in
             
-            self.loadProgressLabel.text = "\(Double(round(100*file.progress))/100)"
-            
-            switch file.status{
-            case .pending:
-                self.loadProgressLabel.textColor = UIColor.lightGray
-                break
-            case .fail:
-                self.loadProgressLabel.textColor = UIColor.red
-                break
-            case .success:
-                self.loadProgressLabel.textColor = UIColor.green
-                break
-            case .progress:
-                self.loadProgressLabel.textColor = UIColor.blue
-                break
-            default:
-                self.loadProgressLabel.textColor = UIColor.gray
-                break
+            DispatchQueue.main.async {
+                self.loadProgressLabel.text = "\(Double(round(100*file.progress))/100)"
+                
+                switch file.status{
+                case .pending:
+                    self.loadProgressLabel.textColor = UIColor.lightGray
+                    break
+                case .fail:
+                    self.loadProgressLabel.textColor = UIColor.red
+                    break
+                case .success:
+                    self.loadProgressLabel.textColor = UIColor.green
+                    break
+                case .progress:
+                    self.loadProgressLabel.textColor = UIColor.blue
+                    break
+                default:
+                    self.loadProgressLabel.textColor = UIColor.gray
+                    break
+                }
             }
         }
         
@@ -144,5 +151,9 @@ class ViewController: UIViewController , UIImagePickerControllerDelegate, UINavi
         }
     }
     
+    
+    private func registerForNotifications() {
+        UNUserNotificationCenter.current().requestAuthorization(options: [.alert, .sound]) { (granted, error) in }
+    }
 }
 

@@ -66,7 +66,7 @@ class BackendAlamofireExecutor: NSObject, BackendExecutorProtocol {
     func downloadFile(backendRequest: BackendRequest, successCallback: @escaping BackendRequestSuccessCallback, failureCallback: @escaping BackendRequestFailureCallback) {
         
         // File located on disk
-        guard let fileId = (backendRequest as? DownloadFileProtocol)?.downloadFileId() else {
+        guard let fileId = (backendRequest as? DownloadFileProtocol)?.fileId else {
             if _isDebugAssertConfiguration(){
                 print("You have not set file id within request. Backend request: \(backendRequest.endpoint()) need to implement Download File protocol")
             }
@@ -122,7 +122,7 @@ class BackendAlamofireExecutor: NSObject, BackendExecutorProtocol {
     ///   - failureCallback: <#failureCallback description#>
     func uploadFile(backendRequest: BackendRequest, successCallback: @escaping BackendRequestSuccessCallback, failureCallback: @escaping BackendRequestFailureCallback) {
         
-        guard let file = (backendRequest as? UploadFileProtocol)?.uploadFile() else {
+        guard let file = (backendRequest as? UploadFileProtocol)?.uploadFile else {
             if _isDebugAssertConfiguration(){
                 print("You have not set upload file within request. Backend request: \(backendRequest.endpoint()) need to implement Upload File protocol")
             }
@@ -130,26 +130,10 @@ class BackendAlamofireExecutor: NSObject, BackendExecutorProtocol {
             return
         }
         
-        
         let url = self.getUrl(backendRequest: backendRequest)
         let method = self.getMethod(backendRequest: backendRequest)
         let headers = backendRequest.headers()
-        let encoding = self.getEncodingType(backendRequest: backendRequest)
-        let params = backendRequest.paramteres()
-        var mainRequest: URLRequest?
-        do{
-            let request = try URLRequest(url: url, method: method, headers: headers)
-            mainRequest = try encoding.encode(request, with: params)
-        }
-        catch{
-            if _isDebugAssertConfiguration(){
-                print("Not able to create url request")
-            }
-            failureCallback(nil, 1001)
-            return
-        }
-        
-    
+
         Alamofire.upload(file.data!, to: url, method: method, headers: headers)
             .uploadProgress { (progress) in
                 
@@ -172,9 +156,36 @@ class BackendAlamofireExecutor: NSObject, BackendExecutorProtocol {
                     failureCallback(response.result.error, response.response?.statusCode ?? -1001)
                 }
         }
+    }
+    
+    func uploadMultipart(backendRequest: BackendRequest, successCallback: @escaping BackendRequestSuccessCallback, failureCallback: @escaping BackendRequestFailureCallback){
         
-        /*
-            
+        guard let file = (backendRequest as? UploadFileProtocol)?.uploadFile else {
+            if _isDebugAssertConfiguration(){
+                print("You have not set upload file within request. Backend request: \(backendRequest.endpoint()) need to implement Upload File protocol")
+            }
+            failureCallback(nil, 1001)
+            return
+        }
+        
+        let url = self.getUrl(backendRequest: backendRequest)
+        let method = self.getMethod(backendRequest: backendRequest)
+        let headers = backendRequest.headers()
+        let encoding = self.getEncodingType(backendRequest: backendRequest)
+        let params = backendRequest.paramteres()
+        var mainRequest: URLRequest?
+        do{
+            let request = try URLRequest(url: url, method: method, headers: headers)
+            mainRequest = try encoding.encode(request, with: params)
+        }
+        catch{
+            if _isDebugAssertConfiguration(){
+                print("Not able to create url request")
+            }
+            failureCallback(nil, 1001)
+            return
+        }
+        
         Alamofire.upload(multipartFormData: { (multipartFormData) in
             
             guard file.data != nil else{
@@ -187,7 +198,6 @@ class BackendAlamofireExecutor: NSObject, BackendExecutorProtocol {
             
             let mime = "\(file.type ?? "image")/\(file.fileExtension ?? "jpg")"
             multipartFormData.append(file.data!, withName: file.type ?? "image", fileName: "\(file.name ?? "image").\(file.fileExtension ?? "jpg")", mimeType: mime)
-            
             
         }, usingThreshold: UInt64.init(), with: mainRequest!) { (result) in
             
@@ -210,7 +220,6 @@ class BackendAlamofireExecutor: NSObject, BackendExecutorProtocol {
                 failureCallback(error as NSError, 400)
             }
         }
-         */
     }
     
     

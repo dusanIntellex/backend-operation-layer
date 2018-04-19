@@ -16,7 +16,7 @@ import UIKit
 
 class BackendOperation: AsyncOperation {
     
-    var executor: BackendAlamofireExecutor?//BackendRequestExecutor?
+    var executor: BackendRequestExecutor?
     var request: BackendRequest?
     
     var onSuccess: BackendRequestSuccessCallback?
@@ -27,7 +27,7 @@ class BackendOperation: AsyncOperation {
     override init() {
         super.init()
         
-        executor = BackendAlamofireExecutor()
+        executor = BackendRequestExecutor()
     }
     
     func isSingleton() -> Bool{
@@ -58,6 +58,9 @@ class BackendOperation: AsyncOperation {
         case .upload:
             upload()
             break
+        case .uploadMultipart:
+            uploadMultipart()
+            break
         }
     }
     
@@ -72,6 +75,15 @@ class BackendOperation: AsyncOperation {
     func upload() {
         
         self.executor?.uploadFile(backendRequest: self.request!, successCallback: { (data, code) in
+            self.handleSuccess(data: data, statusCode: code)
+        }, failureCallback: { (error, code) in
+            self.handleFailure(error: error, statusCode: code)
+        })
+    }
+    
+    func uploadMultipart(){
+        
+        self.executor?.uploadMultipart(backendRequest: self.request!, successCallback: { (data, code) in
             self.handleSuccess(data: data, statusCode: code)
         }, failureCallback: { (error, code) in
             self.handleFailure(error: error, statusCode: code)

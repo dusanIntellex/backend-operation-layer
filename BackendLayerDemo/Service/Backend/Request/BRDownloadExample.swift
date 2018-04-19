@@ -9,8 +9,13 @@
 import UIKit
 
 class BRDownloadExample: NSObject, BackendRequest, DownloadFileProtocol {
-    func downloadFileId() -> String? {
-        return "test"
+    
+    var fileId: String
+
+    override init() {
+        
+        self.fileId = "downloadFile\(Date().timeIntervalSince1970)"
+        super.init()
     }
     
     
@@ -44,5 +49,9 @@ class BRDownloadExample: NSObject, BackendRequest, DownloadFileProtocol {
     
     func createBody() -> Data? {
         return nil
+    }
+    
+    func background() -> Bool {
+        return true
     }
 }

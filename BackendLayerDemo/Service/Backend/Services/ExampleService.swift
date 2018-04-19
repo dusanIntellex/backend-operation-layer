@@ -40,7 +40,7 @@ class ExampleService: BackendService {
         
         operation.onSuccess = {(file, status) in
             
-            self.fileController?.unsubscribe(fileId: (operation.request as? DownloadFileProtocol)?.downloadFileId() ?? "", removeFromPool: true)
+            self.fileController?.unsubscribe(fileId: (operation.request as? DownloadFileProtocol)?.fileId ?? "", removeFromPool: true)
             response(file as? FileLoad)
         }
         
@@ -49,14 +49,14 @@ class ExampleService: BackendService {
             let alert = UIAlertController(title: "Error", message: error?.localizedDescription, preferredStyle: UIAlertControllerStyle.alert)
             alert.addAction(UIAlertAction(title: "OK", style: UIAlertActionStyle.cancel, handler: nil))
             UIApplication.topViewController().present(alert, animated: true, completion: nil)
-            self.fileController?.unsubscribe(fileId: (operation.request as? DownloadFileProtocol)?.downloadFileId() ?? "", removeFromPool: true)
+            self.fileController?.unsubscribe(fileId: (operation.request as? DownloadFileProtocol)?.fileId ?? "", removeFromPool: true)
             response(nil)
         }
         
         self.queue?.addOperation(operation: operation)
         
         // Track progress
-        fileController = FileLoadController.init(fileId: (operation.request as? DownloadFileProtocol)?.downloadFileId() ?? "")
+        fileController = FileLoadController.init(fileId: (operation.request as? DownloadFileProtocol)?.fileId ?? "")
         fileController?.subscribeForFileUpload { (file) in
             progress(file)
         }

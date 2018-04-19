@@ -10,17 +10,17 @@ import UIKit
 import GoogleSignIn
 
 class BRUploadExample: NSObject , BackendRequest, UploadFileProtocol {
-    
-    var uploadFileObject: FileLoad?
+    var uploadFile: FileLoad
     
     init(uploadFile: FileLoad) {
-        super.init()
         
-        self.uploadFileObject = uploadFile
+        self.uploadFile = uploadFile
+        super.init()
     }
     
     func endpoint() -> String {
-        return "https://www.googleapis.com/upload/drive/v3/files?uploadType=media"
+//        return "https://www.googleapis.com/upload/drive/v3/files?uploadType=media"
+        return "https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart"
     }
     
     func method() -> HttpMethod {
@@ -39,7 +39,7 @@ class BRUploadExample: NSObject , BackendRequest, UploadFileProtocol {
     }
     
     func requestType() -> RequestType? {
-        return .upload
+        return .uploadMultipart
     }
     
     func firebaseObserver() -> Bool? {
@@ -54,10 +54,8 @@ class BRUploadExample: NSObject , BackendRequest, UploadFileProtocol {
         return nil
     }
     
-    func uploadFile() -> FileLoad? {
-        return self.uploadFileObject
+    func background() -> Bool {
+        return true
     }
-    
-
     
 }

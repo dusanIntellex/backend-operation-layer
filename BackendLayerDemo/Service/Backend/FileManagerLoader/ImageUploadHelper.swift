@@ -146,7 +146,9 @@ class ImageUploadHelper: NSObject {
                 }
             }
             
-            let file = FileLoad(fileId: url.lastPathComponent ?? "")
+            let time = ".\(Date().timeIntervalSince1970)"
+            let id = (url.lastPathComponent ?? "")
+            let file = FileLoad(fileId: id + time)
             file.path = url as URL
             file.data = data
             file.fileExtension = fileExt

@@ -19,6 +19,7 @@ let BRFilePathConst = "path"
 enum RequestType {
     case rest
     case upload
+    case uploadMultipart
     case download
 }
 
@@ -41,12 +42,12 @@ enum HttpMethod : String{
 
 protocol UploadFileProtocol {
     
-    func uploadFile() -> FileLoad?
+    var uploadFile: FileLoad{ get }
 }
 
 protocol DownloadFileProtocol {
     
-    func downloadFileId() -> String?
+    var fileId: String{ get }
 }
 
 /// Every request have to implement this protocol.
@@ -79,4 +80,9 @@ protocol BackendRequest {
     ///
     /// - Returns: Data
     func createBody() -> Data?
+    
+    /// If request can be done in background set true or false
+    ///
+    /// - Returns: Background flag
+    func background() -> Bool
 }

@@ -10,6 +10,7 @@ import UIKit
 
 class BRRestSampleRequest: NSObject , BackendRequest{
     
+    
     func endpoint() -> String {
         return "https://jsonplaceholder.typicode.com/posts/1"
     }
@@ -42,7 +43,9 @@ class BRRestSampleRequest: NSObject , BackendRequest{
         return nil
     }
     
-
+    func background() -> Bool {
+        return false
+    }
     
     
 }
