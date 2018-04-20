@@ -448,7 +448,7 @@ class BackendRequestExecutor: NSObject, URLSessionTaskDelegate,URLSessionDelegat
          */
     }
     
-    func copyFileTemporaryDirectory(file: Data, fileExtension: String ) -> URL?
+    private func copyFileTemporaryDirectory(file: Data, fileExtension: String ) -> URL?
     {
         
         let tempDirectoryURL = NSURL.fileURL(withPath: NSTemporaryDirectory(), isDirectory: true)

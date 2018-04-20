@@ -16,8 +16,8 @@ import UIKit
 
 class BackendOperation: AsyncOperation {
     
-    lazy var executor: BackendRequestExecutor = {
-        return BackendRequestExecutor()
+    lazy var executor: BackendAlamofireExecutor = {
+        return BackendAlamofireExecutor()
     }()
     
     var request: BackendRequest?
@@ -32,8 +32,8 @@ class BackendOperation: AsyncOperation {
 
         self.request = request
         
-        if var requestWithParams = request as? SendingDataProtocol, model != nil{
-            requestWithParams.sendingModel = model!
+        if let _ = request as? SendingDataProtocol, model != nil{
+            (self.request as! SendingDataProtocol).sendingModel = model!
         }
     }
 
@@ -43,12 +43,12 @@ class BackendOperation: AsyncOperation {
 
         self.request = request
         
-        if var requestWithParams = request as? SendingDataProtocol, model != nil{
-            requestWithParams.sendingModel = model!
+        if let _ = request as? SendingDataProtocol, model != nil{
+            (self.request as! SendingDataProtocol).sendingModel = model!
         }
         
-        if var uploadRequest = request as? UploadFileProtocol, uploadFile != nil{
-            uploadRequest.uploadFile = uploadFile!
+        if let _ = request as? UploadFileProtocol, uploadFile != nil{
+            (self.request as! UploadFileProtocol).uploadFile = uploadFile!
         }
     }
 

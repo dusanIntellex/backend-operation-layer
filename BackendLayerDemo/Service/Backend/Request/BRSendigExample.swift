@@ -9,7 +9,7 @@
 import Foundation
 
 
-struct BRSendigExample : BackendRequest, SendingDataProtocol, UploadFileProtocol{
+class BRSendigExample : BackendRequest, SendingDataProtocol, UploadFileProtocol{
     
     var sendingModel: BaseModel?
     var uploadFile: FileLoad?

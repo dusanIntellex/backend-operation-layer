@@ -9,14 +9,13 @@
 import UIKit
 import GoogleSignIn
 
-struct BRUploadExample : BackendRequest, UploadFileProtocol {
+class BRUploadExample : BackendRequest, UploadFileProtocol {
     
     var uploadFile: FileLoad?
     
-    
     func endpoint() -> String {
-//        return "https://www.googleapis.com/upload/drive/v3/files?uploadType=media"
-        return "https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart"
+        return "https://www.googleapis.com/upload/drive/v3/files?uploadType=media"
+//        return "https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart"
     }
     
     func method() -> HttpMethod {
@@ -31,7 +30,7 @@ struct BRUploadExample : BackendRequest, UploadFileProtocol {
     }
     
     func requestType() -> RequestType? {
-        return .uploadMultipart
+        return .upload
     }
     
     func encodingType() -> ParametersEncodingType? {

@@ -74,7 +74,6 @@ class ExampleService: BackendService {
                     progress(file)
                 }
                 
-                
                 let operation = BackendOperation(model: nil, request: BackendReqestRegister.Example.upload, uploadFile)
                 
                 operation.onSuccess = {(json, status) in
@@ -94,13 +93,6 @@ class ExampleService: BackendService {
                 
                 self.queue?.addOperation(operation: operation)
             }
-            
-            
         }
-    }
-    
-    func test(){
-        
-        let operation = BackendOperation(model: nil, request: BackendReqestRegister.Example.download)
     }
 }

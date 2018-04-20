@@ -8,6 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		181BE7192089E36B00EAD075 /* BaseModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 181BE7182089E36B00EAD075 /* BaseModel.swift */; };
+		181BE71B2089F39300EAD075 /* BackendAlamofireExecutor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 181BE71A2089F39200EAD075 /* BackendAlamofireExecutor.swift */; };
 		184B88B22076374B00C77A77 /* BackendOperation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 184B889C2076374B00C77A77 /* BackendOperation.swift */; };
 		184B88B32076374B00C77A77 /* AsyncOperation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 184B889D2076374B00C77A77 /* AsyncOperation.swift */; };
 		184B88B42076374B00C77A77 /* BackendService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 184B889E2076374B00C77A77 /* BackendService.swift */; };
@@ -45,6 +46,7 @@
 
 /* Begin PBXFileReference section */
 		181BE7182089E36B00EAD075 /* BaseModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BaseModel.swift; sourceTree = "<group>"; };
+		181BE71A2089F39200EAD075 /* BackendAlamofireExecutor.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BackendAlamofireExecutor.swift; sourceTree = "<group>"; };
 		184B889C2076374B00C77A77 /* BackendOperation.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BackendOperation.swift; sourceTree = "<group>"; };
 		184B889D2076374B00C77A77 /* AsyncOperation.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AsyncOperation.swift; sourceTree = "<group>"; };
 		184B889E2076374B00C77A77 /* BackendService.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BackendService.swift; sourceTree = "<group>"; };
@@ -169,6 +171,7 @@
 			children = (
 				184B88AB2076374B00C77A77 /* BackendExecutorProtocol.swift */,
 				184B88AD2076374B00C77A77 /* BackendRequestExecutor.swift */,
+				181BE71A2089F39200EAD075 /* BackendAlamofireExecutor.swift */,
 			);
 			path = Executor;
 			sourceTree = "<group>";
@@ -425,6 +428,7 @@
 				18DFDF76207D106A0017DDCB /* BRDownloadExample.swift in Sources */,
 				184B88C12076374B00C77A77 /* BackendConstants.swift in Sources */,
 				181BE7192089E36B00EAD075 /* BaseModel.swift in Sources */,
+				181BE71B2089F39300EAD075 /* BackendAlamofireExecutor.swift in Sources */,
 				18DFDF73207D0C5D0017DDCB /* ServiceRegister.swift in Sources */,
 				18F9CF961FB9C15F0015CD27 /* AppDelegate.swift in Sources */,
 				185D4A562084CB3A0002C9F7 /* BRUploadExample.swift in Sources */,

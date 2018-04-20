@@ -39,7 +39,7 @@ enum HttpMethod : String{
     case insert = "insert"
 }
 
-protocol UploadFileProtocol {
+protocol UploadFileProtocol : class {
     
     var uploadFile: FileLoad?{ get set }
 }
@@ -49,7 +49,7 @@ protocol DownloadFileProtocol {
     var fileId: String{ get }
 }
 
-protocol SendingDataProtocol {
+protocol SendingDataProtocol : class {
     
     var sendingModel : BaseModel? { get set }
 }

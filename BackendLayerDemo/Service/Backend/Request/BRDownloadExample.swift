@@ -8,7 +8,7 @@
 
 import UIKit
 
-struct BRDownloadExample: BackendRequest, DownloadFileProtocol, BackgroundModeProtocol {
+class BRDownloadExample: BackendRequest, DownloadFileProtocol, BackgroundModeProtocol {
     
     var fileId: String
 

@@ -57,7 +57,12 @@ public class FileLoadController: NSObject {
             if removeFromPool{
                 FilesPool.sharedInstance.pool?.enumerated().forEach{
                     if $0.element.fileId == file?.fileId{
-                        FilesPool.sharedInstance.pool?.remove(at: $0.offset)
+                        if $0.offset < (FilesPool.sharedInstance.pool?.count)!{
+                            FilesPool.sharedInstance.pool?.remove(at: $0.offset)
+                        }
+                        else{
+                            assertionFailure("Something wrong with this pool. Check this!!!")
+                        }
                     }
                 }
             }
