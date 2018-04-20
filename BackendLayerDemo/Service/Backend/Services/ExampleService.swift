@@ -98,4 +98,9 @@ class ExampleService: BackendService {
             
         }
     }
+    
+    func test(){
+        
+        let operation = BackendOperation(model: nil, request: BackendReqestRegister.Example.download)
+    }
 }

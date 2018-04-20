@@ -9,13 +9,11 @@
 import UIKit
 import GoogleSignIn
 
-class BRUploadExample: NSObject , BackendRequest, UploadFileProtocol {
+struct BRUploadExample : BackendRequest, UploadFileProtocol {
+    
     var uploadFile: FileLoad
     
-    init(uploadFile: FileLoad) {
-        
-        self.uploadFile = uploadFile
-        super.init()
+    init() {
     }
     
     func endpoint() -> String {
@@ -25,10 +23,6 @@ class BRUploadExample: NSObject , BackendRequest, UploadFileProtocol {
     
     func method() -> HttpMethod {
         return .post
-    }
-    
-    func paramteres() -> Dictionary<String, Any>? {
-        return nil
     }
     
     func headers() -> Dictionary<String, String>? {
@@ -42,20 +36,8 @@ class BRUploadExample: NSObject , BackendRequest, UploadFileProtocol {
         return .uploadMultipart
     }
     
-    func firebaseObserver() -> Bool? {
-        return nil
-    }
-    
     func encodingType() -> ParametersEncodingType? {
         return nil
-    }
-    
-    func createBody() -> Data? {
-        return nil
-    }
-    
-    func background() -> Bool {
-        return true
     }
     
 }

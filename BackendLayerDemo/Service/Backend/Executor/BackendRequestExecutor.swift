@@ -35,7 +35,7 @@ class BackendRequestExecutor: NSObject, URLSessionTaskDelegate,URLSessionDelegat
     
     func getSession(request: BackendRequest) -> URLSession{
         
-        return request.background() ? backgroundSession : regularSession
+        return (request as? BackgroundModeProtocol) != nil ? backgroundSession : regularSession
     }
     
     //MARK:- Execute
@@ -152,8 +152,16 @@ class BackendRequestExecutor: NSObject, URLSessionTaskDelegate,URLSessionDelegat
         let boundary = "Boundary-\(UUID().uuidString)"
         request.setValue("multipart/form-data; boundary=\(boundary)", forHTTPHeaderField: "Content-Type")
         
-        let params = backendRequest.paramteres()
-        request.httpBody = createBody(parameters: params as? [String : String], boundary: boundary, data: file.data!, mimeType: file.mimeType ?? "", filename: file.name ?? "untitled")
+        let params : [String : String]
+        if backendRequest as? SendingDataProtocol != nil {
+            if let sendObject = (backendRequest as? SendingDataProtocol)?.sendingModel{
+                
+                let jsonData = try? JSONEncoder().encode(sendObject)
+                params = try JSONSerialization.jsonObject(with: jsonData, options: []) as? [String : Any]
+            }
+        }
+        
+        request.httpBody = createBody(parameters: params, boundary: boundary, data: file.data!, mimeType: file.mimeType ?? "", filename: file.name ?? "untitled")
         
         let session = getSession(request: backendRequest)
         

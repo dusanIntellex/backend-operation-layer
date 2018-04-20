@@ -8,14 +8,12 @@
 
 import UIKit
 
-class BRDownloadExample: NSObject, BackendRequest, DownloadFileProtocol {
+struct BRDownloadExample: BackendRequest, DownloadFileProtocol, BackgroundModeProtocol {
     
     var fileId: String
 
-    override init() {
-        
+    init() {
         self.fileId = "downloadFile\(Date().timeIntervalSince1970)"
-        super.init()
     }
     
     

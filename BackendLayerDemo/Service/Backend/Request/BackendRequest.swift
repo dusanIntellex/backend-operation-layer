@@ -42,12 +42,21 @@ enum HttpMethod : String{
 
 protocol UploadFileProtocol {
     
-    var uploadFile: FileLoad{ get }
+    var uploadFile: FileLoad{ get set }
 }
 
 protocol DownloadFileProtocol {
     
     var fileId: String{ get }
+}
+
+protocol SendingDataProtocol {
+    
+    func sendingModel<T: Encodable>() -> T
+}
+
+protocol BackgroundModeProtocol {
+    
 }
 
 /// Every request have to implement this protocol.
@@ -56,33 +65,19 @@ protocol BackendRequest {
     func endpoint() -> String
     func method() -> HttpMethod
     
-    /// For upload and download use const from top of the class
-    ///
-    /// - Returns: Dictionary
-    func paramteres() -> Dictionary<String, Any>?
     func headers() -> Dictionary<String, String>?
     
-    func requestType() -> RequestType?
-    
-    /// Value is used to track changes on real datebase in Firebse. Default is nil
+    /// Return what type of request is
     ///
-    /// - Returns: Bool value for tracking changes of observer model in Firebase
-    func firebaseObserver() -> Bool?
-    
+    /// - Returns: Enums: rest,upload,uploadMultipart,download
+    func requestType() -> RequestType?
     
     /// Type which define how will parameters be encoded
     ///
     /// - Returns: Enum values of enciding type
     func encodingType() -> ParametersEncodingType?
-    
-    
-    /// If encoding Type is custom body, executor will use custom body for created request
-    ///
-    /// - Returns: Data
-    func createBody() -> Data?
-    
-    /// If request can be done in background set true or false
-    ///
-    /// - Returns: Background flag
-    func background() -> Bool
 }
+
+
+
+

@@ -30,6 +30,32 @@ class BackendOperation: AsyncOperation {
         executor = BackendRequestExecutor()
     }
     
+    init(model: Encodable?, request: BackendRequest?) {
+        super.init()
+        
+        self.request = request as! BackendRequest
+        
+        if var requestWithParams = request as? SendingDataProtocol, model != nil{
+            requestWithParams.sendingModel()
+        }
+    }
+
+
+    init(model: Encodable?, request: BackendRequest?,_ uploadFile: FileLoad?) {
+        super.init()
+        
+        self.request = request as! BackendRequest
+        
+        if var requestWithParams = request as? SendingDataProtocol, model != nil{
+            requestWithParams.sendingModel = model!
+        }
+        
+        if var uploadRequest = request as? UploadFileProtocol, uploadFile != nil{
+            uploadRequest.uploadFile = uploadFile!
+        }
+    }
+
+    
     func isSingleton() -> Bool{
         
         return false
