@@ -11,6 +11,7 @@ import Foundation
 struct BackendReqestRegister{
 
     struct Example{
+        static var rest = BRRestSampleRequest()
         static var download = BRDownloadExample()
         static var upload = BRUploadExample()
     }

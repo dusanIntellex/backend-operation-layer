@@ -16,7 +16,10 @@ import UIKit
 
 class BackendOperation: AsyncOperation {
     
-    var executor: BackendRequestExecutor?
+    lazy var executor: BackendRequestExecutor = {
+        return BackendRequestExecutor()
+    }()
+    
     var request: BackendRequest?
     
     var onSuccess: BackendRequestSuccessCallback?
@@ -24,27 +27,21 @@ class BackendOperation: AsyncOperation {
     
     // MARK:- Initilizer
     
-    override init() {
+    init(model: BaseModel?, request: BackendRequest?) {
         super.init()
-        
-        executor = BackendRequestExecutor()
-    }
-    
-    init(model: Encodable?, request: BackendRequest?) {
-        super.init()
-        
-        self.request = request as! BackendRequest
+
+        self.request = request
         
         if var requestWithParams = request as? SendingDataProtocol, model != nil{
-            requestWithParams.sendingModel()
+            requestWithParams.sendingModel = model!
         }
     }
 
 
-    init(model: Encodable?, request: BackendRequest?,_ uploadFile: FileLoad?) {
+    init(model: BaseModel?, request: BackendRequest?,_ uploadFile: FileLoad?) {
         super.init()
-        
-        self.request = request as! BackendRequest
+
+        self.request = request
         
         if var requestWithParams = request as? SendingDataProtocol, model != nil{
             requestWithParams.sendingModel = model!
@@ -91,7 +88,7 @@ class BackendOperation: AsyncOperation {
     }
     
     func rest(){
-        self.executor?.executeBackendRequest(backendRequest: self.request!, successCallback: { (data, code) in
+        self.executor.executeBackendRequest(backendRequest: self.request!, successCallback: { (data, code) in
             self.handleSuccess(data: data, statusCode: code)
         }, failureCallback: { (error, code) in
             self.handleFailure(error: error, statusCode: code)
@@ -100,7 +97,7 @@ class BackendOperation: AsyncOperation {
     
     func upload() {
         
-        self.executor?.uploadFile(backendRequest: self.request!, successCallback: { (data, code) in
+        self.executor.uploadFile(backendRequest: self.request!, successCallback: { (data, code) in
             self.handleSuccess(data: data, statusCode: code)
         }, failureCallback: { (error, code) in
             self.handleFailure(error: error, statusCode: code)
@@ -109,7 +106,7 @@ class BackendOperation: AsyncOperation {
     
     func uploadMultipart(){
         
-        self.executor?.uploadMultipart(backendRequest: self.request!, successCallback: { (data, code) in
+        self.executor.uploadMultipart(backendRequest: self.request!, successCallback: { (data, code) in
             self.handleSuccess(data: data, statusCode: code)
         }, failureCallback: { (error, code) in
             self.handleFailure(error: error, statusCode: code)
@@ -118,7 +115,7 @@ class BackendOperation: AsyncOperation {
     
     func download() {
         
-        self.executor?.downloadFile(backendRequest: self.request!, successCallback: { (data, code) in
+        self.executor.downloadFile(backendRequest: self.request!, successCallback: { (data, code) in
             self.handleSuccess(data: data, statusCode: code)
         }, failureCallback: { (error, code) in
             self.handleFailure(error: error, statusCode: code)
@@ -129,7 +126,7 @@ class BackendOperation: AsyncOperation {
     
     override func cancel() {
         
-        self.executor?.cancel()
+        self.executor.cancel()
         
         if (self.onFailure != nil){
             onFailure!(nil,0)

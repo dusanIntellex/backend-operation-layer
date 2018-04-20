@@ -8,6 +8,6 @@
 
 import UIKit
 
-class BaseModel: NSObject {
+class BaseModel: NSObject, Codable {
 
 }

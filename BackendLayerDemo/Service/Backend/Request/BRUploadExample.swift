@@ -11,10 +11,8 @@ import GoogleSignIn
 
 struct BRUploadExample : BackendRequest, UploadFileProtocol {
     
-    var uploadFile: FileLoad
+    var uploadFile: FileLoad?
     
-    init() {
-    }
     
     func endpoint() -> String {
 //        return "https://www.googleapis.com/upload/drive/v3/files?uploadType=media"

@@ -11,6 +11,9 @@ import Foundation
 
 struct BRSendigExample : BackendRequest, SendingDataProtocol, UploadFileProtocol{
     
+    var sendingModel: BaseModel?
+    var uploadFile: FileLoad?
+    
     func endpoint() -> String {
         return "endpoint"
     }
@@ -30,8 +33,4 @@ struct BRSendigExample : BackendRequest, SendingDataProtocol, UploadFileProtocol
     func encodingType() -> ParametersEncodingType? {
         return .jsonBody
     }
-    
-    var sendingModel: Encodable
-    var uploadFile: FileLoad
-    
 }

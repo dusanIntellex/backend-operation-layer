@@ -15,7 +15,7 @@ class ExampleService: BackendService {
     
     func getRestExample(response: @escaping (_ dataResponse: Any?) -> Void){
         
-        let operation = BORestExample()
+        let operation = BackendOperation(model: nil, request: BackendReqestRegister.Example.rest)
         
         operation.onSuccess = {(data, status) in
             
@@ -36,7 +36,7 @@ class ExampleService: BackendService {
     
     func downloadFile(response: @escaping (_ responseFile: FileLoad?) -> Void, progress: @escaping (_ file : FileLoad) -> Void){
 
-        let operation = BODownloadExample()
+        let operation = BackendOperation(model: nil, request: BackendReqestRegister.Example.download)
         
         operation.onSuccess = {(file, status) in
             
@@ -75,7 +75,7 @@ class ExampleService: BackendService {
                 }
                 
                 
-                let operation = BOUploadExample(file: uploadFile)
+                let operation = BackendOperation(model: nil, request: BackendReqestRegister.Example.upload, uploadFile)
                 
                 operation.onSuccess = {(json, status) in
                     

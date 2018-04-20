@@ -16,17 +16,17 @@ class BackendRequestExecutor: NSObject, URLSessionTaskDelegate,URLSessionDelegat
     
     let timeoutInterval = 60.0
     private lazy var regularSession: URLSession = { [unowned self] in
-
+        
         let config = URLSessionConfiguration.default
         return URLSession(configuration: config, delegate: self, delegateQueue: OperationQueue.main)
-    }()
+        }()
     
     private lazy var backgroundSession: URLSession = { [unowned self] in
         let config = URLSessionConfiguration.background(withIdentifier: Constant.sessionID.rawValue + ".\(Date().timeIntervalSince1970)")
-//        config.isDiscretionary = true
+        //        config.isDiscretionary = true
         config.sessionSendsLaunchEvents = true
         return URLSession(configuration: config, delegate: self, delegateQueue: nil)
-    }()
+        }()
     
     var dataTask: URLSessionTask?
     var loadFile: FileLoad?
@@ -152,16 +152,18 @@ class BackendRequestExecutor: NSObject, URLSessionTaskDelegate,URLSessionDelegat
         let boundary = "Boundary-\(UUID().uuidString)"
         request.setValue("multipart/form-data; boundary=\(boundary)", forHTTPHeaderField: "Content-Type")
         
-        let params : [String : String]
+        var params : [String : Any]?
         if backendRequest as? SendingDataProtocol != nil {
             if let sendObject = (backendRequest as? SendingDataProtocol)?.sendingModel{
                 
-                let jsonData = try? JSONEncoder().encode(sendObject)
-                params = try JSONSerialization.jsonObject(with: jsonData, options: []) as? [String : Any]
+                guard let sendingParams = encodeSendingData(sendObject) else{
+                    return
+                }
+                params = sendingParams
             }
         }
         
-        request.httpBody = createBody(parameters: params, boundary: boundary, data: file.data!, mimeType: file.mimeType ?? "", filename: file.name ?? "untitled")
+        request.httpBody = createBody(parameters: params as? [String : String], boundary: boundary, data: file.data!, mimeType: file.mimeType ?? "", filename: file.name ?? "untitled")
         
         let session = getSession(request: backendRequest)
         
@@ -175,7 +177,25 @@ class BackendRequestExecutor: NSObject, URLSessionTaskDelegate,URLSessionDelegat
         }
     }
     
-    func createBody(parameters: [String: String]?,
+    
+    private func encodeSendingData<T: Encodable>(_ sendData: T) -> [String : Any]?{
+        
+        if let jsonData = try? JSONEncoder().encode(sendData){
+            do{
+                return try JSONSerialization.jsonObject(with: jsonData, options: []) as? [String : Any]
+            }
+            catch{
+                return nil
+            }
+        }
+        if _isDebugAssertConfiguration(){
+            print("Not able to encode data")
+        }
+        failureCallback?(nil, 1001)
+        return nil
+    }
+    
+    private func createBody(parameters: [String: String]?,
                     boundary: String,
                     data: Data,
                     mimeType: String,
@@ -203,7 +223,7 @@ class BackendRequestExecutor: NSObject, URLSessionTaskDelegate,URLSessionDelegat
         return body as Data
     }
     
-    func requestWithBackendRequest(backendRequest: BackendRequest) -> URLRequest{
+    private func requestWithBackendRequest(backendRequest: BackendRequest) -> URLRequest{
         
         let urlString = SERVER_URL.appending(backendRequest.endpoint())
         let url = URL(string: urlString)
@@ -224,14 +244,21 @@ class BackendRequestExecutor: NSObject, URLSessionTaskDelegate,URLSessionDelegat
             }
         }
         
+        var params : [String : Any]?
+        if backendRequest as? SendingDataProtocol != nil {
+            if let sendObject = (backendRequest as? SendingDataProtocol)?.sendingModel{
+                params = encodeSendingData(sendObject)
+            }
+        }
+        
         // Set params
-        if let encodingType = backendRequest.encodingType(), let params = backendRequest.paramteres(){
+        if let encodingType = backendRequest.encodingType(), params != nil {
             
             switch encodingType{
                 
             case .jsonBody:
                 do{
-                    let jsonParams = try JSONSerialization.data(withJSONObject: params, options: .prettyPrinted)
+                    let jsonParams = try JSONSerialization.data(withJSONObject: params!, options: .prettyPrinted)
                     request.httpBody = jsonParams
                 }
                 catch{
@@ -241,7 +268,7 @@ class BackendRequestExecutor: NSObject, URLSessionTaskDelegate,URLSessionDelegat
                 
             case .multipartBodyURLEncode:
                 
-                if let data = encodeUrlParams(request: backendRequest).data(using: .utf8){
+                if let data = encodeUrlParams(requestParams: params!).data(using: .utf8){
                     request.httpBody = data
                 }
                 else{
@@ -251,31 +278,13 @@ class BackendRequestExecutor: NSObject, URLSessionTaskDelegate,URLSessionDelegat
                 break
                 
             case .urlEncode:
-                let urlString = (request.url?.absoluteString)! + encodeUrlParams(request: backendRequest)
+                let urlString = (request.url?.absoluteString)! + encodeUrlParams(requestParams: params!)
                 request.url = URL(string: urlString)
                 break
-                
-            case .customBody:
-                if let body = backendRequest.createBody(){
-                    request.httpBody = body
-                }
-                break
-            }
-        }
-            
-        if let params = backendRequest.paramteres(){
-            
-            do{
-                let jsonParams = try JSONSerialization.data(withJSONObject: params, options: .prettyPrinted)
-                request.httpBody = jsonParams
-            }
-            catch{
-                print(error.localizedDescription)
             }
         }
         
-        print("\n\nService request:\nEndpoint:\(backendRequest.endpoint())\nHeaders:\(String(describing: request.allHTTPHeaderFields))\nParams:\(String(describing: backendRequest.paramteres()))")
-        
+        print("\n\nService request:\nEndpoint:\(backendRequest.endpoint())\nHeaders:\(String(describing: request.allHTTPHeaderFields))\nParams:\(String(describing: params))")
         return request as URLRequest
     }
     
@@ -294,17 +303,15 @@ class BackendRequestExecutor: NSObject, URLSessionTaskDelegate,URLSessionDelegat
         self.dataTask?.suspend()
     }
     
-    private func encodeUrlParams(request: BackendRequest) -> String{
+    func encodeUrlParams(requestParams: [String: Any]) -> String{
         
         var urlParamsEncode = "?"
-        if let params = request.paramteres(){
-            
-            for (key, value) in params{
-                if urlParamsEncode.count > 1 { urlParamsEncode.append("&")}
-                urlParamsEncode.append(key)
-                urlParamsEncode.append("=")
-                urlParamsEncode.append(String(describing: value))
-            }
+        
+        for (key, value) in requestParams{
+            if urlParamsEncode.count > 1 { urlParamsEncode.append("&")}
+            urlParamsEncode.append(key)
+            urlParamsEncode.append("=")
+            urlParamsEncode.append(String(describing: value))
         }
         
         let allowedCharacters = NSCharacterSet.urlQueryAllowed
@@ -314,9 +321,9 @@ class BackendRequestExecutor: NSObject, URLSessionTaskDelegate,URLSessionDelegat
         
         return urlParamsEncode
     }
-
+    
     //MARK:- Session delegate for tracking upload and download progress
-
+    
     func urlSession(_ session: URLSession, task: URLSessionTask, didSendBodyData bytesSent: Int64, totalBytesSent: Int64, totalBytesExpectedToSend: Int64) {
         let uploadProgress:Float = Float(totalBytesSent) / Float(totalBytesExpectedToSend)
         print("\nBackend executor Upload Progres: \(uploadProgress)\n")
@@ -347,7 +354,7 @@ class BackendRequestExecutor: NSObject, URLSessionTaskDelegate,URLSessionDelegat
         
         if error != nil{
             self.loadFile?.status = .fail
-        
+            
             self.failureCallback?(error, statusCode)
             return
         }
@@ -420,25 +427,25 @@ class BackendRequestExecutor: NSObject, URLSessionTaskDelegate,URLSessionDelegat
             appDelegate.bgSessionCompletionHandler = nil
             completionHandler()
         }
-
+        
         /*
-        if let appDelegate = UIApplication.shared.delegate as? AppDelegate{
-            
-            guard appDelegate.responds(to: Selector(("bgSessionCompletionHandler"))) else{
-                assertionFailure("Implement bgSessionCompletionHandler in AppDelegate")
-                return
-            }
-            
-            var property = AppDelegate.value(forKey: "bgSessionCompletionHandler")
-            let completionHandler = NSSelectorFromString("AppDelegate.bgSessionCompletionHandler")
-
-            DispatchQueue.main.async {
-                
-                property = nil
-                self.perform(completionHandler)
-            }
-        }
-    */
+         if let appDelegate = UIApplication.shared.delegate as? AppDelegate{
+         
+         guard appDelegate.responds(to: Selector(("bgSessionCompletionHandler"))) else{
+         assertionFailure("Implement bgSessionCompletionHandler in AppDelegate")
+         return
+         }
+         
+         var property = AppDelegate.value(forKey: "bgSessionCompletionHandler")
+         let completionHandler = NSSelectorFromString("AppDelegate.bgSessionCompletionHandler")
+         
+         DispatchQueue.main.async {
+         
+         property = nil
+         self.perform(completionHandler)
+         }
+         }
+         */
     }
     
     func copyFileTemporaryDirectory(file: Data, fileExtension: String ) -> URL?
@@ -458,7 +465,6 @@ class BackendRequestExecutor: NSObject, URLSessionTaskDelegate,URLSessionDelegat
         }
         return nil
     }
-    
 }
 
 extension NSMutableData {
@@ -467,4 +473,5 @@ extension NSMutableData {
         append(data!)
     }
 }
+
 

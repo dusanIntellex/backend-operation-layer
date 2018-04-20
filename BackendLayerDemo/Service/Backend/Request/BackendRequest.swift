@@ -28,7 +28,6 @@ enum ParametersEncodingType {
     case multipartBodyURLEncode
     case urlEncode
     case jsonBody
-    case customBody
 }
 
 enum HttpMethod : String{
@@ -42,7 +41,7 @@ enum HttpMethod : String{
 
 protocol UploadFileProtocol {
     
-    var uploadFile: FileLoad{ get set }
+    var uploadFile: FileLoad?{ get set }
 }
 
 protocol DownloadFileProtocol {
@@ -52,7 +51,7 @@ protocol DownloadFileProtocol {
 
 protocol SendingDataProtocol {
     
-    func sendingModel<T: Encodable>() -> T
+    var sendingModel : BaseModel? { get set }
 }
 
 protocol BackgroundModeProtocol {
