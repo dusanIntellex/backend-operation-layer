@@ -325,7 +325,7 @@ class BackendAlamofireExecutor: NSObject, BackendExecutorProtocol {
             switch paramsEncodingType{
                 
             case .jsonBody:
-                return JSONEncoding.default
+                return JSONEncoding.prettyPrinted
                 
             case .multipartBodyURLEncode:
                 return URLEncoding.httpBody

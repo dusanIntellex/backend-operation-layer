@@ -16,8 +16,8 @@ import UIKit
 
 class BackendOperation: AsyncOperation {
     
-    lazy var executor: BackendAlamofireExecutor = {
-        return BackendAlamofireExecutor()
+    lazy var executor: BackendRequestExecutor = {
+        return BackendRequestExecutor()//BackendAlamofireExecutor()
     }()
     
     var request: BackendRequest?

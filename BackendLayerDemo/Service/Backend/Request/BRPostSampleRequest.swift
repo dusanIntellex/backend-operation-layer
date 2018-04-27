@@ -27,7 +27,7 @@ class BRPostSampleRequest: NSObject, BackendRequest, SendingDataProtocol {
     }
     
     func encodingType() -> ParametersEncodingType? {
-        return .urlEncode
+        return .jsonBody
     }
     
     var sendingModel: BaseModel?
