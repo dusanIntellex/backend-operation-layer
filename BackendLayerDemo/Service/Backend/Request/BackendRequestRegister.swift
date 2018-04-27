@@ -12,6 +12,7 @@ struct BackendReqestRegister{
 
     struct Example{
         static let rest = BRRestSampleRequest()
+        static let post = BRPostSampleRequest()
         static let download = BRDownloadExample()
         static let upload = BRUploadExample()
     }

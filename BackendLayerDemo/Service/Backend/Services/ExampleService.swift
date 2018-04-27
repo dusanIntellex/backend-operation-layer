@@ -34,6 +34,27 @@ class ExampleService: BackendService {
         self.queue?.addOperation(operation: operation)
     }
     
+    func postRestExample(exampleModel: ExampleModel, response: @escaping (_ response: Any?) -> Void){
+        
+        let operation = BackendOperation(model: exampleModel, request: BackendReqestRegister.Example.post)
+        
+        operation.onSuccess = {(data, status) in
+            
+            response(data)
+        }
+        
+        operation.onFailure = {(error, status) in
+            
+            let alert = UIAlertController(title: "Error", message: error?.localizedDescription, preferredStyle: UIAlertControllerStyle.alert)
+            alert.addAction(UIAlertAction(title: "OK", style: UIAlertActionStyle.cancel, handler: nil))
+            UIApplication.topViewController().present(alert, animated: true, completion: nil)
+            
+            response(nil)
+        }
+        
+        self.queue?.addOperation(operation: operation)
+    }
+    
     func downloadFile(response: @escaping (_ responseFile: FileLoad?) -> Void, progress: @escaping (_ file : FileLoad) -> Void){
 
         let operation = BackendOperation(model: nil, request: BackendReqestRegister.Example.download)

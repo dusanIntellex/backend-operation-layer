@@ -8,8 +8,9 @@
 
 import UIKit
 
-class BRRestSampleRequest: NSObject , BackendRequest{
+class BRRestSampleRequest: NSObject , BackendRequest, SendingDataProtocol{
     
+    var sendingModel: BaseModel?
     
     func endpoint() -> String {
         return "https://jsonplaceholder.typicode.com/posts/1"
