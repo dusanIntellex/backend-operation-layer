@@ -40,6 +40,8 @@
 	<string>Get library items</string>
 	<key>NSCameraUsageDescription</key>
 	<string>Get camera images</string>
+	<key>NSMicrophoneUsageDescription</key>
+	<string>Take video with sound</string>
 	<key>NSPhotoLibraryAddUsageDescription</key>
 	<string>Use library items</string>
 	<key>NSPhotoLibraryUsageDescription</key>

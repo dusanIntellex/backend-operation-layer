@@ -64,6 +64,10 @@ class ImageUploadHelper: NSObject {
             let image = info[UIImagePickerControllerEditedImage] as! UIImage
             UIImageWriteToSavedPhotosAlbum(image, self, #selector(self.image(_:didFinishSavingWithError:contextInfo:)), nil)
         }
+        else if mediaType.isEqual(to: kUTTypeVideo as String) || mediaType.isEqual(to: kUTTypeMovie as String){
+            let videoURL = info[UIImagePickerControllerMediaURL]as? NSURL
+            UISaveVideoAtPathToSavedPhotosAlbum((videoURL?.path)!, self, #selector(self.video(_:didFinishSavingWithError:contextInfo:)), nil)
+        }
         else{
             if fileUpload != nil{
                 fileUpload!(nil)
@@ -83,6 +87,19 @@ class ImageUploadHelper: NSObject {
             }
         } else {
             fetchLastImage()
+        }
+    }
+    
+    @objc static func video(_ videoPath: String, didFinishSavingWithError error: NSError?, contextInfo: UnsafeRawPointer) {
+
+        let videoUrl = NSURL(fileURLWithPath: videoPath)
+        
+        do{
+            let videoData = try Data(contentsOf: videoUrl as URL)
+            createFileUpload(url: videoUrl as URL, data: videoData, mediaType: "video")
+        }
+        catch{
+            print("Error:\(error.localizedDescription)")
         }
     }
     
@@ -122,8 +139,8 @@ class ImageUploadHelper: NSObject {
                 return
             }
             
-            if let _ = info!["PHImageFileURLKey"] as? NSURL {
-                createFileUpload(info: info!, data: data)
+            if let url = info!["PHImageFileURLKey"] as? NSURL {
+                createFileUpload(url: url as URL, data: data, mediaType:"image")
             }
             else{
                 if fileUpload != nil{
@@ -133,37 +150,27 @@ class ImageUploadHelper: NSObject {
         }
     }
     
-    private static func createFileUpload(info: [AnyHashable: Any], data : Data?){
+    private static func createFileUpload(url : URL, data : Data?, mediaType: String){
         
-        print(info)
-        if let url = info["PHImageFileURLKey"] as? NSURL{
-            var fileExt = ""
-            var fileName = ""
-            if let parts = url.lastPathComponent?.components(separatedBy: "."){
-                if parts.count > 1{
-                    fileName = parts[0]
-                    fileExt = parts[1]
-                }
-            }
-            
-            let time = ".\(Date().timeIntervalSince1970)"
-            let id = (url.lastPathComponent ?? "")
-            let file = FileLoad(fileId: id + time)
-            file.path = url as URL
-            file.data = data
-            file.fileExtension = fileExt
-            file.name = fileName
-            file.type = "image"
-            
-            if fileUpload != nil{
-                fileUpload!(file)
-            }
+        var fileExt = ""
+        var fileName = ""
+        let parts = url.lastPathComponent.components(separatedBy: ".")
+        if parts.count > 1{
+            fileName = parts[0]
+            fileExt = parts[1]
         }
-        else{
-            if fileUpload != nil{
-                fileUpload!(nil)
-            }
+        
+        let time = ".\(Date().timeIntervalSince1970)"
+        let id = url.lastPathComponent
+        let file = FileLoad(fileId: id + time)
+        file.path = url as URL
+        file.data = data
+        file.fileExtension = fileExt
+        file.name = fileName
+        file.type = mediaType
+        
+        if fileUpload != nil{
+            fileUpload!(file)
         }
     }
-    
 }

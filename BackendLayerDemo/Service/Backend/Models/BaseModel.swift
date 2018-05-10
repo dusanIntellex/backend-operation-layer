@@ -8,7 +8,7 @@
 
 import UIKit
 
-class BaseModel: NSObject, Codable{
+class BaseModel: Codable{
 
     func encode(to encoder: Encoder) throws {
         assertionFailure("Implement encode function for class \(String(describing: self))")

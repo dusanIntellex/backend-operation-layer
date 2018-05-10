@@ -8,6 +8,7 @@
 
 import UIKit
 import UserNotifications
+import MobileCoreServices
 
 class ViewController: UIViewController , UIImagePickerControllerDelegate, UINavigationControllerDelegate{
     
@@ -152,6 +153,7 @@ class ViewController: UIViewController , UIImagePickerControllerDelegate, UINavi
         let imagePicker = UIImagePickerController()
         imagePicker.delegate = self
         imagePicker.allowsEditing = true
+        imagePicker.mediaTypes = [kUTTypeMovie as String]
         
         AlertHelper.alertWithTwoOptionsAndCancel(NSLocalizedString("Select file to upload", comment: ""), message: NSLocalizedString("Select source ", comment: ""), closeTitle: NSLocalizedString("Photos", comment: ""), actionTitle: NSLocalizedString("Camera", comment: ""), closeButton: {
             

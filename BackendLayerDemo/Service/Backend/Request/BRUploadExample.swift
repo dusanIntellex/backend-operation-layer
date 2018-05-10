@@ -14,8 +14,8 @@ class BRUploadExample : BackendRequest, UploadFileProtocol {
     var uploadFile: FileLoad?
     
     func endpoint() -> String {
-        return "https://www.googleapis.com/upload/drive/v3/files?uploadType=media"
-//        return "https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart"
+//        return "https://www.googleapis.com/upload/drive/v3/files?uploadType=media"
+        return "https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart"
     }
     
     func method() -> HttpMethod {
@@ -26,7 +26,7 @@ class BRUploadExample : BackendRequest, UploadFileProtocol {
         let token = GIDSignIn.sharedInstance().currentUser.authentication.accessToken ?? ""
         print(token)
         return ["Authorization" : "Bearer \(token)",
-                "Content-Type": "image/jpeg"]
+                "Content-Type": "multipart/related; boundary=foo_bar_baz"]
     }
     
     func requestType() -> RequestType? {
