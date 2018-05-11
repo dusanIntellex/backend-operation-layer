@@ -88,37 +88,37 @@ class BackendOperation: AsyncOperation {
     }
     
     func rest(){
-        self.executor.executeBackendRequest(backendRequest: self.request!, successCallback: { (data, code) in
-            self.handleSuccess(data: data, statusCode: code)
-        }, failureCallback: { (error, code) in
-            self.handleFailure(error: error, statusCode: code)
+        self.executor.executeBackendRequest(backendRequest: self.request!, successCallback: { [weak self] (data, code) in
+            self?.handleSuccess(data: data, statusCode: code)
+        }, failureCallback: { [weak self] (error, code) in
+            self?.handleFailure(error: error, statusCode: code)
         })
     }
     
     func upload() {
         
-        self.executor.uploadFile(backendRequest: self.request!, successCallback: { (data, code) in
-            self.handleSuccess(data: data, statusCode: code)
-        }, failureCallback: { (error, code) in
-            self.handleFailure(error: error, statusCode: code)
+        self.executor.uploadFile(backendRequest: self.request!, successCallback: { [weak self] (data, code) in
+            self?.handleSuccess(data: data, statusCode: code)
+        }, failureCallback: { [weak self] (error, code) in
+            self?.handleFailure(error: error, statusCode: code)
         })
     }
     
     func uploadMultipart(){
         
-        self.executor.uploadMultipart(backendRequest: self.request!, successCallback: { (data, code) in
-            self.handleSuccess(data: data, statusCode: code)
-        }, failureCallback: { (error, code) in
-            self.handleFailure(error: error, statusCode: code)
+        self.executor.uploadMultipart(backendRequest: self.request!, successCallback: { [weak self] (data, code) in
+            self?.handleSuccess(data: data, statusCode: code)
+        }, failureCallback: { [weak self] (error, code) in
+            self?.handleFailure(error: error, statusCode: code)
         })
     }
     
     func download() {
         
-        self.executor.downloadFile(backendRequest: self.request!, successCallback: { (data, code) in
-            self.handleSuccess(data: data, statusCode: code)
-        }, failureCallback: { (error, code) in
-            self.handleFailure(error: error, statusCode: code)
+        self.executor.downloadFile(backendRequest: self.request!, successCallback: { [weak self] (data, code) in
+            self?.handleSuccess(data: data, statusCode: code)
+        }, failureCallback: { [weak self] (error, code) in
+            self?.handleFailure(error: error, statusCode: code)
         })
     }
     
@@ -138,32 +138,32 @@ class BackendOperation: AsyncOperation {
     
     func handleSuccess(data: Any?, statusCode: NSInteger){
         
-        DispatchQueue.main.async {
+        DispatchQueue.main.async { [weak self] in
             
             
             // TODO: For any special handling of status code, do this here!!
-            if self.onSuccess != nil{
+            if self?.onSuccess != nil{
                 
                 if statusCode == 200{
         
-                    self.onSuccess!(data, statusCode)
+                    self?.onSuccess!(data, statusCode)
                 }
                 else{
-                    self.onSuccess!(nil, statusCode)
+                    self?.onSuccess!(nil, statusCode)
                 }
             }
             
-            self.finish()
+            self?.finish()
         }
     }
     
     func handleFailure(error: Error?, statusCode: NSInteger){
         
-        DispatchQueue.main.async {
+        DispatchQueue.main.async { [weak self] in
             
-            if self.onFailure != nil{
+            if self?.onFailure != nil{
                 
-                self.onFailure!(error, statusCode)
+                self?.onFailure!(error, statusCode)
             }
         }
         

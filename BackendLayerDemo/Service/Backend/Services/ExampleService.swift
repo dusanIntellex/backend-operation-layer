@@ -59,18 +59,18 @@ class ExampleService: BackendService {
 
         let operation = BackendOperation(model: nil, request: BackendReqestRegister.Example.download)
         
-        operation.onSuccess = {(file, status) in
+        operation.onSuccess = { [weak self] (file, status) in
             
-            self.fileController?.unsubscribe(fileId: (operation.request as? DownloadFileProtocol)?.fileId ?? "", removeFromPool: true)
+            self?.fileController?.unsubscribe(fileId: (operation.request as? DownloadFileProtocol)?.fileId ?? "", removeFromPool: true)
             response(file as? FileLoad)
         }
         
-        operation.onFailure = {(error, status) in
+        operation.onFailure = { [weak self] (error, status) in
             
             let alert = UIAlertController(title: "Error", message: error?.localizedDescription, preferredStyle: UIAlertControllerStyle.alert)
             alert.addAction(UIAlertAction(title: "OK", style: UIAlertActionStyle.cancel, handler: nil))
             UIApplication.topViewController().present(alert, animated: true, completion: nil)
-            self.fileController?.unsubscribe(fileId: (operation.request as? DownloadFileProtocol)?.fileId ?? "", removeFromPool: true)
+            self?.fileController?.unsubscribe(fileId: (operation.request as? DownloadFileProtocol)?.fileId ?? "", removeFromPool: true)
             response(nil)
         }
         
@@ -85,13 +85,13 @@ class ExampleService: BackendService {
     
     func uploadFile(uploadFile: FileLoad, response: @escaping SuccessCallback,  progress: @escaping (_ file : FileLoad) -> Void){
         
-        GoogleClient.authorize { [unowned self] (success) in
+        GoogleClient.authorize { [weak self] (success) in
 
             if success{
 
                 // Track progress
-                self.fileController = FileLoadController.init(fileId: uploadFile.fileId ?? "")
-                self.fileController?.subscribeForFileUpload { (file) in
+                self?.fileController = FileLoadController.init(fileId: uploadFile.fileId ?? "")
+                self?.fileController?.subscribeForFileUpload { (file) in
                     progress(file)
                 }
                 
@@ -99,7 +99,7 @@ class ExampleService: BackendService {
                 
                 operation.onSuccess = {(json, status) in
                     
-                    self.fileController?.unsubscribe(fileId: uploadFile.fileId ?? "", removeFromPool: true)
+                    self?.fileController?.unsubscribe(fileId: uploadFile.fileId ?? "", removeFromPool: true)
                     response(true)
                 }
                 
@@ -108,11 +108,11 @@ class ExampleService: BackendService {
                     let alert = UIAlertController(title: "Error", message: error?.localizedDescription, preferredStyle: UIAlertControllerStyle.alert)
                     alert.addAction(UIAlertAction(title: "OK", style: UIAlertActionStyle.cancel, handler: nil))
                     UIApplication.topViewController().present(alert, animated: true, completion: nil)
-                    self.fileController?.unsubscribe(fileId: uploadFile.fileId ?? "", removeFromPool: true)
+                    self?.fileController?.unsubscribe(fileId: uploadFile.fileId ?? "", removeFromPool: true)
                     response(false)
                 }
                 
-                self.queue?.addOperation(operation: operation)
+                self?.queue?.addOperation(operation: operation)
             }
         }
     }

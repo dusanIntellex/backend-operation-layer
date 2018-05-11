@@ -30,12 +30,12 @@ class ViewController: UIViewController , UIImagePickerControllerDelegate, UINavi
     
     @IBAction func requestAction(_ sender: UIButton) {
         
-        ServiceRegister.sharedInstance.example.getRestExample { (data) in
+        ServiceRegister.sharedInstance.example.getRestExample { [weak self] (data) in
             
             if let dict = data as? [String: Any]{
                 let alert = UIAlertController(title: "Success", message: dict["body"] as? String, preferredStyle: UIAlertControllerStyle.alert)
                 alert.addAction(UIAlertAction(title: "OK", style: UIAlertActionStyle.cancel, handler: nil))
-                self.present(alert, animated: true, completion: nil)
+                self?.present(alert, animated: true, completion: nil)
             }
         }
     }
@@ -46,12 +46,12 @@ class ViewController: UIViewController , UIImagePickerControllerDelegate, UINavi
         sendingModel.id = 1
         sendingModel.name = "test"
         
-        ServiceRegister.sharedInstance.example.postRestExample(exampleModel: sendingModel) { (data) in
+        ServiceRegister.sharedInstance.example.postRestExample(exampleModel: sendingModel) { [weak self] (data) in
             
             if let dict = data as? [String: Any]{
                 let alert = UIAlertController(title: "Success", message: dict["body"] as? String, preferredStyle: UIAlertControllerStyle.alert)
                 alert.addAction(UIAlertAction(title: "OK", style: UIAlertActionStyle.cancel, handler: nil))
-                self.present(alert, animated: true, completion: nil)
+                self?.present(alert, animated: true, completion: nil)
             }
         }
     }
@@ -59,36 +59,36 @@ class ViewController: UIViewController , UIImagePickerControllerDelegate, UINavi
     
     @IBAction func downloadAction(_ sender: UIButton) {
         
-        ServiceRegister.sharedInstance.example.downloadFile(response: { (downloadedFile) in
+        ServiceRegister.sharedInstance.example.downloadFile(response: { [weak self] (downloadedFile) in
             if downloadedFile != nil{
                 let alert = UIAlertController(title: "Success", message: "File successfuly downloaded.\nYou can find it on url: \(downloadedFile?.path?.absoluteString ?? "")", preferredStyle: UIAlertControllerStyle.alert)
                 alert.addAction(UIAlertAction(title: "OK", style: UIAlertActionStyle.cancel, handler: nil))
-                self.present(alert, animated: true, completion: nil)
+                self?.present(alert, animated: true, completion: nil)
                 
 //                if let delegate = UIApplication.shared.delegate as? AppDelegate{
 //                    delegate.postNotification()
 //                }
             }
-        }) { (file) in
+        }) { [weak self] (file) in
             
             DispatchQueue.main.async {
-                self.loadProgressLabel.text = "\(Double(round(100*file.progress))/100)"
+                self?.loadProgressLabel.text = "\(Double(round(100*file.progress))/100)"
                 
                 switch file.status{
                 case .pending:
-                    self.loadProgressLabel.textColor = UIColor.lightGray
+                    self?.loadProgressLabel.textColor = UIColor.lightGray
                     break
                 case .fail:
-                    self.loadProgressLabel.textColor = UIColor.red
+                    self?.loadProgressLabel.textColor = UIColor.red
                     break
                 case .success:
-                    self.loadProgressLabel.textColor = UIColor.green
+                    self?.loadProgressLabel.textColor = UIColor.green
                     break
                 case .progress:
-                    self.loadProgressLabel.textColor = UIColor.blue
+                    self?.loadProgressLabel.textColor = UIColor.blue
                     break
                 default:
-                    self.loadProgressLabel.textColor = UIColor.gray
+                    self?.loadProgressLabel.textColor = UIColor.gray
                     break
                 }
             }
@@ -101,10 +101,10 @@ class ViewController: UIViewController , UIImagePickerControllerDelegate, UINavi
     
     func imagePickerController(_ picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [String : Any]) {
         
-        ImageUploadHelper.createUploadFile(imageInfo: info, imageSource: picker.sourceType) { (file) in
+        ImageUploadHelper.createUploadFile(imageInfo: info, imageSource: picker.sourceType) { [weak self] (file) in
             
             if file != nil{
-                self.uploadFile(file: file!)
+                self?.uploadFile(file: file!)
             }
         }
         
@@ -113,34 +113,34 @@ class ViewController: UIViewController , UIImagePickerControllerDelegate, UINavi
     
     func uploadFile(file: FileLoad){
         
-        ServiceRegister.sharedInstance.example.uploadFile(uploadFile: file, response: { (success) in
+        ServiceRegister.sharedInstance.example.uploadFile(uploadFile: file, response: { [weak self] (success) in
             
             if success{
                 let alert = UIAlertController(title: "Success", message: "File successfuly uploaded", preferredStyle: UIAlertControllerStyle.alert)
                 alert.addAction(UIAlertAction(title: "OK", style: UIAlertActionStyle.cancel, handler: nil))
-                self.present(alert, animated: true, completion: nil)
+                self?.present(alert, animated: true, completion: nil)
             }
             
-        }) { (file) in
+        }) { [weak self] (file) in
             
             DispatchQueue.main.async {
-                self.loadProgressLabel.text = "\(Double(round(100*file.progress))/100)"
+                self?.loadProgressLabel.text = "\(Double(round(100*file.progress))/100)"
                 
                 switch file.status{
                 case .pending:
-                    self.loadProgressLabel.textColor = UIColor.lightGray
+                    self?.loadProgressLabel.textColor = UIColor.lightGray
                     break
                 case .fail:
-                    self.loadProgressLabel.textColor = UIColor.red
+                    self?.loadProgressLabel.textColor = UIColor.red
                     break
                 case .success:
-                    self.loadProgressLabel.textColor = UIColor.green
+                    self?.loadProgressLabel.textColor = UIColor.green
                     break
                 case .progress:
-                    self.loadProgressLabel.textColor = UIColor.blue
+                    self?.loadProgressLabel.textColor = UIColor.blue
                     break
                 default:
-                    self.loadProgressLabel.textColor = UIColor.gray
+                    self?.loadProgressLabel.textColor = UIColor.gray
                     break
                 }
             }
