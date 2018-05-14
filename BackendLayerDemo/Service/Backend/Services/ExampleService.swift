@@ -11,7 +11,6 @@ import UIKit
 class ExampleService: BackendService {
     
     private var fileController: FileLoadController?
-
     
     func getRestExample(response: @escaping (_ dataResponse: Any?) -> Void){
         

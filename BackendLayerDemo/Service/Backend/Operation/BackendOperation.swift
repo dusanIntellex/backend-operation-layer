@@ -14,6 +14,20 @@ import UIKit
  To use different backend executors (Firebase, native iOS URLSession, Alamofire) just change class of executor
 */
 
+enum ResponseError : Error{
+    case noInternetConnection
+}
+
+extension ResponseError : LocalizedError{
+    
+    public var errorDescription: String?{
+        switch self {
+        case .noInternetConnection:
+            return NSLocalizedString("No internet connection", comment: "")
+        }
+    }
+}
+
 class BackendOperation: AsyncOperation {
     
     lazy var executor: BackendRequestExecutor = {
@@ -64,6 +78,11 @@ class BackendOperation: AsyncOperation {
         
         // Check connection
         guard Reachability.isConnectedToNetwork() else{
+            
+            if (self.onFailure != nil){
+                onFailure!(ResponseError.noInternetConnection,0)
+            }
+            
             self.finish()
             // TODO: Handle internet connection
             return

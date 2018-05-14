@@ -8,7 +8,7 @@
 
 import UIKit
 
-class PaginationModel: NSObject, Codable {
+class PaginationModel: BaseModel {
 
     var total:Int?
     var count: Int?
@@ -26,7 +26,7 @@ class PaginationModel: NSObject, Codable {
         case links
     }
     
-    func encode(to encoder: Encoder) throws {
+    override func encode(to encoder: Encoder) throws {
         var container = encoder.container(keyedBy: CodingKeys.self)
         try container.encode(total, forKey: .total)
         try container.encode(count, forKey: .count)
@@ -37,6 +37,7 @@ class PaginationModel: NSObject, Codable {
     }
     
     required init(from decoder: Decoder) throws {
+        try super.init(from: decoder)
         let values = try decoder.container(keyedBy: CodingKeys.self)
         total = try? values.decode(Int.self, forKey: .total)
         count = try? values.decode(Int.self, forKey: .count)

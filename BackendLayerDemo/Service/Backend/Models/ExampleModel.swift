@@ -14,7 +14,6 @@ class ExampleModel: BaseModel {
     var name: String?
     
     enum CodingKeys: String, CodingKey {
-        
         case id
         case name
     }
