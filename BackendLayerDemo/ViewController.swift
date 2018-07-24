@@ -1,4 +1,4 @@
-//
+    //
 //  ViewController.swift
 //  BackendLayerDemo
 //
@@ -42,11 +42,11 @@ class ViewController: UIViewController , UIImagePickerControllerDelegate, UINavi
     
     @IBAction func postRequestAction(_ sender: UIButton) {
         
-        let sendingModel = ExampleModel()
-        sendingModel.id = 1
-        sendingModel.name = "test"
         
-        ServiceRegister.sharedInstance.example.postRestExample(exampleModel: sendingModel) { [weak self] (data) in
+//        let sendingModel = ExampleModel(id: 999991, name: "test")
+        let sendingModel = ExampleModelObject(id: 987456)
+        
+        ServiceRegister.sharedInstance.example.postRestExample(exampleModelObject: sendingModel) { [weak self] (data) in
             
             if let dict = data as? [String: Any]{
                 let alert = UIAlertController(title: "Success", message: dict["body"] as? String, preferredStyle: UIAlertControllerStyle.alert)

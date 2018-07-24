@@ -37,4 +37,6 @@ class BRUploadExample : BackendRequest, UploadFileProtocol {
         return nil
     }
     
+    func setSendingData(_ sendingData: Encodable) {
+    }
 }

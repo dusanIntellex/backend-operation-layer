@@ -11,7 +11,9 @@ import Foundation
 
 class BRSendigExample : BackendRequest, SendingDataProtocol, UploadFileProtocol{
     
-    var sendingModel: BaseModel?
+    var sendingModel: ExampleModel?
+    typealias GenericEncodableType = ExampleModel
+
     var uploadFile: FileLoad?
     
     func endpoint() -> String {

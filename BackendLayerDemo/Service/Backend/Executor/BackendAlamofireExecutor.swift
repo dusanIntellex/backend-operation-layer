@@ -53,7 +53,7 @@ class BackendAlamofireExecutor: NSObject, BackendExecutorProtocol {
         let params = self.getParams(backendRequest: backendRequest)
         
         if _isDebugAssertConfiguration(){
-            print("Service request:\nEndpoint:\(backendRequest.endpoint())\nURL:\(url.absoluteString)\nHeaders:\(headers))\nParams:\(String(describing: params))")
+            print("\nBackend service request:\nEndpoint:\(backendRequest.endpoint())\nURL:\(url.absoluteString)\nMethod:\(method.rawValue)\nEncoding:\(encoding)\nHeaders:\(headers))\nParams:\(String(describing: params))")
         }
         
         dataTask = getSession(request: backendRequest).request(url, method: method, parameters: params, encoding:  encoding, headers:headers).responseJSON { (response:DataResponse<Any>) in
@@ -320,7 +320,7 @@ class BackendAlamofireExecutor: NSObject, BackendExecutorProtocol {
     /// - Returns: ParameterEncoding (Alamofire enum)
     private func getEncodingType(backendRequest: BackendRequest) -> ParameterEncoding{
         
-        if let paramsEncodingType = backendRequest.encodingType(){
+        if let paramsEncodingType = (backendRequest as? SendingDataManageProtocol)?.encodingType(){
             
             switch paramsEncodingType{
                 
@@ -337,15 +337,11 @@ class BackendAlamofireExecutor: NSObject, BackendExecutorProtocol {
         return URLEncoding.httpBody
     }
     
-    private func getParams(backendRequest: BackendRequest) -> [String : Any]?{
+    private func getParams(backendRequest: BackendRequest) -> [String : Any]{
         
-        var params : [String : Any]?
-        if backendRequest as? SendingDataProtocol != nil {
-            if let sendObject = (backendRequest as? SendingDataProtocol)?.sendingModel{
-                params = encodeSendingData(sendObject)
-            }
+        guard let params = (backendRequest as? SendingDataManageProtocol)?.getEncodedData()  else {
+            return [String:Any]()
         }
-        
         return params
     }
     

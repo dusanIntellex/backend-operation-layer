@@ -16,7 +16,10 @@ public class FileLoadController: NSObject {
     public var file: FileLoad?
     var handler : FileObserverHandler?
     var keyPaths = [#keyPath(FileLoad.progress), #keyPath(FileLoad.status)]
-    var addedKeyPaths = Array<Any>()
+    lazy var addedKeyPaths : [Any] = {
+        return Array<Any>()
+    }()
+    
     
     public init(fileId: String) {
         

@@ -153,14 +153,9 @@ class BackendRequestExecutor: NSObject, URLSessionTaskDelegate,URLSessionDelegat
         request.setValue("multipart/form-data; boundary=\(boundary)", forHTTPHeaderField: "Content-Type")
         
         var params : [String : Any]?
-        if backendRequest as? SendingDataProtocol != nil {
-            if let sendObject = (backendRequest as? SendingDataProtocol)?.sendingModel{
-                
-                guard let sendingParams = encodeSendingData(sendObject) else{
-                    return
-                }
-                params = sendingParams
-            }
+        
+        if let request = backendRequest as? SendingDataManageProtocol {
+            params = request.getEncodedData()
         }
         
         request.httpBody = createBody(parameters: params as? [String : String], boundary: boundary, data: file.data!, mimeType: file.mimeType ?? "", filename: file.name ?? "untitled")
@@ -175,24 +170,6 @@ class BackendRequestExecutor: NSObject, URLSessionTaskDelegate,URLSessionDelegat
             self.dataTask = session.uploadTask(with: request as URLRequest, fromFile: tempURL) // session.uploadTask(with: request, from: file.data!)
             self.dataTask?.resume()
         }
-    }
-    
-    
-    private func encodeSendingData<T: Encodable>(_ sendData: T) -> [String : Any]?{
-        
-        if let jsonData = try? JSONEncoder().encode(sendData){
-            do{
-                return try JSONSerialization.jsonObject(with: jsonData, options: []) as? [String : Any]
-            }
-            catch{
-                return nil
-            }
-        }
-        if _isDebugAssertConfiguration(){
-            print("Not able to encode data")
-        }
-        failureCallback?(nil, 1001)
-        return nil
     }
     
     private func createBody(parameters: [String: String]?,
@@ -245,14 +222,19 @@ class BackendRequestExecutor: NSObject, URLSessionTaskDelegate,URLSessionDelegat
         }
         
         var params : [String : Any]?
-        if backendRequest as? SendingDataProtocol != nil {
-            if let sendObject = (backendRequest as? SendingDataProtocol)?.sendingModel{
-                params = encodeSendingData(sendObject)
+        
+        if let request = backendRequest as? SendingDataManageProtocol {
+            
+            if let encodedParams = request.getEncodedData(){
+                params = encodedParams
+            }
+            else if _isDebugAssertConfiguration(){
+                print("Not able to encode data")
             }
         }
         
         // Set params
-        if let encodingType = backendRequest.encodingType(), params != nil {
+        if let encodingType = (backendRequest as? SendingDataManageProtocol)?.encodingType(), params != nil {
             
             switch encodingType{
                 
@@ -284,7 +266,10 @@ class BackendRequestExecutor: NSObject, URLSessionTaskDelegate,URLSessionDelegat
             }
         }
         
-        print("\n\nService request:\nEndpoint:\(backendRequest.endpoint())\nHeaders:\(String(describing: request.allHTTPHeaderFields))\nParams:\(String(describing: params))")
+        if _isDebugAssertConfiguration(){
+            print("\nBackend service request:\nEndpoint:\(backendRequest.endpoint())\nURL:\(request.url?.absoluteString ?? "")\nMethod:\(request.httpMethod)\nEncoding:\(String(describing: (backendRequest as? SendingDataManageProtocol)?.encodingType().debugDescription))\nHeaders:\(String(describing: request.allHTTPHeaderFields)))\nParams:\(String(describing: params))")
+        }
+        
         return request as URLRequest
     }
     
@@ -325,9 +310,8 @@ class BackendRequestExecutor: NSObject, URLSessionTaskDelegate,URLSessionDelegat
     //MARK:- Session delegate for tracking upload and download progress
     
     func urlSession(_ session: URLSession, task: URLSessionTask, didSendBodyData bytesSent: Int64, totalBytesSent: Int64, totalBytesExpectedToSend: Int64) {
-        let uploadProgress:Float = Float(totalBytesSent) / Float(totalBytesExpectedToSend)
-        print("\nBackend executor Upload Progres: \(uploadProgress)\n")
         
+        let uploadProgress:Float = Float(totalBytesSent) / Float(totalBytesExpectedToSend)
         if let file = self.loadFile {
             
             file.progress = CGFloat(uploadProgress)
@@ -338,8 +322,6 @@ class BackendRequestExecutor: NSObject, URLSessionTaskDelegate,URLSessionDelegat
     func urlSession(_ session: URLSession, downloadTask: URLSessionDownloadTask, didWriteData bytesWritten: Int64, totalBytesWritten: Int64, totalBytesExpectedToWrite: Int64) {
         
         let downloadProgress:Float = Float(totalBytesWritten) / Float(totalBytesExpectedToWrite)
-        print("\nBackend executor Download Progres: \(downloadProgress)\n")
-        
         if let file = self.loadFile {
             
             file.progress = CGFloat(downloadProgress)

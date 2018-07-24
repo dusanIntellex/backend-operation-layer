@@ -8,7 +8,7 @@
 
 import UIKit
 
-class PaginationModel: BaseModel {
+struct PaginationModel: Codable {
 
     var total:Int?
     var count: Int?
@@ -16,7 +16,8 @@ class PaginationModel: BaseModel {
     var currentPage: Int?
     var totalPages: Int?
     var links:[String]?
-    
+   
+    /*
     enum CodingKeys: String, CodingKey {
         case total
         case count
@@ -46,6 +47,7 @@ class PaginationModel: BaseModel {
         totalPages = try? values.decode(Int.self, forKey: .totalPages)
         links = try? values.decode([String].self, forKey: .links)
     }
+ */
     
     var nextPage: Int?{
         get{

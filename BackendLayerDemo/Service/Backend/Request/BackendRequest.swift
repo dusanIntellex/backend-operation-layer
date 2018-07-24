@@ -49,10 +49,41 @@ protocol DownloadFileProtocol {
     var fileId: String{ get }
 }
 
-protocol SendingDataProtocol : class {
+public protocol SendingDataProtocol {
     
-    var sendingModel : BaseModel? { get set }
+    associatedtype GenericEncodableType : Encodable
+    var sendingModel : GenericEncodableType? { get set }
 }
+
+protocol SendingDataManageProtocol {
+    
+    func setSendingData(data: Encodable)
+    func getEncodedData() -> [String: Any]?
+    
+    /// Type which define how will parameters be encoded
+    ///
+    /// - Returns: Enum values of enciding type
+    func encodingType() -> ParametersEncodingType?
+}
+
+extension SendingDataProtocol{
+    
+    func encode() -> [String: Any]? {
+        
+        if let jsonData = try? JSONEncoder().encode(sendingModel!){
+            do{
+                return try JSONSerialization.jsonObject(with: jsonData, options: []) as? [String : Any]
+            }
+            catch{
+                return nil
+            }
+        }
+        
+        return [String: Any]()
+    }
+}
+
+typealias SendingProtocols = SendingDataProtocol & SendingDataManageProtocol
 
 protocol BackgroundModeProtocol {
     
@@ -63,20 +94,13 @@ protocol BackendRequest {
     
     func endpoint() -> String
     func method() -> HttpMethod
-    
     func headers() -> Dictionary<String, String>?
     
     /// Return what type of request is
     ///
     /// - Returns: Enums: rest,upload,uploadMultipart,download
     func requestType() -> RequestType?
-    
-    /// Type which define how will parameters be encoded
-    ///
-    /// - Returns: Enum values of enciding type
-    func encodingType() -> ParametersEncodingType?
 }
-
 
 
 

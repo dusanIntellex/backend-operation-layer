@@ -8,9 +8,7 @@
 
 import UIKit
 
-class BRRestSampleRequest: NSObject , BackendRequest, SendingDataProtocol{
-    
-    var sendingModel: BaseModel?
+class BRRestSampleRequest: NSObject , BackendRequest{
     
     func endpoint() -> String {
         return "https://jsonplaceholder.typicode.com/posts/1"
@@ -20,10 +18,6 @@ class BRRestSampleRequest: NSObject , BackendRequest, SendingDataProtocol{
         return .get
     }
     
-    func paramteres() -> Dictionary<String, Any>? {
-        return nil
-    }
-    
     func headers() -> Dictionary<String, String>? {
         return nil
     }
@@ -31,22 +25,4 @@ class BRRestSampleRequest: NSObject , BackendRequest, SendingDataProtocol{
     func requestType() -> RequestType? {
         return .rest
     }
-    
-    func firebaseObserver() -> Bool? {
-        return nil
-    }
-    
-    func encodingType() -> ParametersEncodingType? {
-        return nil
-    }
-    
-    func createBody() -> Data? {
-        return nil
-    }
-    
-    func background() -> Bool {
-        return false
-    }
-    
-    
 }

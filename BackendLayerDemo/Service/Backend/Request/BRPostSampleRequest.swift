@@ -8,7 +8,20 @@
 
 import UIKit
 
-class BRPostSampleRequest: NSObject, BackendRequest, SendingDataProtocol {
+class BRPostSampleRequest: NSObject, BackendRequest, SendingProtocols {
+    
+    func getEncodedData() -> [String : Any]? {
+        return self.encode()
+    }
+    
+    func setSendingData(data: Encodable) {
+        if let data = data as? ExampleModelObject{
+            self.sendingModel = data
+        }
+    }
+    
+    typealias GenericEncodableType = ExampleModelObject
+    var sendingModel: ExampleModelObject?
     
     func endpoint() -> String {
         return "https://jsonplaceholder.typicode.com/posts"
@@ -29,9 +42,4 @@ class BRPostSampleRequest: NSObject, BackendRequest, SendingDataProtocol {
     func encodingType() -> ParametersEncodingType? {
         return .jsonBody
     }
-    
-    var sendingModel: BaseModel?
-    
-
-    
 }

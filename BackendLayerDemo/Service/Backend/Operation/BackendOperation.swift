@@ -30,8 +30,9 @@ extension ResponseError : LocalizedError{
 
 class BackendOperation: AsyncOperation {
     
-    lazy var executor: BackendRequestExecutor = {
-        return BackendRequestExecutor()//BackendAlamofireExecutor()
+    lazy var executor: BackendExecutorProtocol = {
+        return BackendAlamofireExecutor()
+//        return BackendRequestExecutor()
     }()
     
     var request: BackendRequest?
@@ -41,24 +42,24 @@ class BackendOperation: AsyncOperation {
     
     // MARK:- Initilizer
     
-    init(model: BaseModel?, request: BackendRequest?) {
+    init(model: Encodable?, request: BackendRequest?) {
         super.init()
 
         self.request = request
-        
-        if let _ = request as? SendingDataProtocol, model != nil{
-            (self.request as! SendingDataProtocol).sendingModel = model!
+
+        if let req = request as? SendingDataManageProtocol, model != nil{
+            req.setSendingData(data: model!)
         }
     }
 
 
-    init(model: BaseModel?, request: BackendRequest?,_ uploadFile: FileLoad?) {
+    init(model: Encodable?, request: BackendRequest?,_ uploadFile: FileLoad?) {
         super.init()
 
         self.request = request
         
-        if let _ = request as? SendingDataProtocol, model != nil{
-            (self.request as! SendingDataProtocol).sendingModel = model!
+        if let req = request as? SendingDataManageProtocol, model != nil{
+            req.setSendingData(data: model!)
         }
         
         if let _ = request as? UploadFileProtocol, uploadFile != nil{
@@ -163,7 +164,7 @@ class BackendOperation: AsyncOperation {
             // TODO: For any special handling of status code, do this here!!
             if self?.onSuccess != nil{
                 
-                if statusCode == 200{
+                if 200 <= statusCode && statusCode < 300{
         
                     self?.onSuccess!(data, statusCode)
                 }

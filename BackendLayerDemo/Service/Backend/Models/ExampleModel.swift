@@ -8,20 +8,21 @@
 
 import UIKit
 
-class ExampleModel: BaseModel {
+struct ExampleModel: Codable {
 
     var id: Int?
     var name: String?
     
-    enum CodingKeys: String, CodingKey {
-        case id
-        case name
+}
+
+class ExampleModelObject : NSObject , Codable{
+    
+    var id: Int?
+    
+    init(id: Int) {
+        super.init()
+        
+        self.id = id
     }
     
-    override func encode(to encoder: Encoder) throws {
-        var container = encoder.container(keyedBy: CodingKeys.self)
-        
-        try container.encode(id, forKey: .id)
-        try container.encode(name, forKey: .name)
-    }
 }
