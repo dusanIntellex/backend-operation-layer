@@ -1,0 +1,6 @@
+framework module BackendServiceAdapter {
+  umbrella header "BackendServiceAdapter-umbrella.h"
+
+  export *
+  module * { export * }
+}
