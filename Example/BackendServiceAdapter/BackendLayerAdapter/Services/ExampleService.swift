@@ -24,7 +24,7 @@ class ExampleService: BackendService {
         
         operation.onFailure = {(error, status) in
             
-            let alert = UIAlertController(title: "Error", message: error?.localizedDescription, preferredStyle: UIAlertControllerStyle.alert)
+            let alert = UIAlertController(title: "Error", message: error.localizedDescription, preferredStyle: UIAlertControllerStyle.alert)
             alert.addAction(UIAlertAction(title: "OK", style: UIAlertActionStyle.cancel, handler: nil))
             UIApplication.topViewController().present(alert, animated: true, completion: nil)
             
@@ -45,7 +45,7 @@ class ExampleService: BackendService {
         
         operation.onFailure = {(error, status) in
             
-            let alert = UIAlertController(title: "Error", message: error?.localizedDescription, preferredStyle: UIAlertControllerStyle.alert)
+            let alert = UIAlertController(title: "Error", message: error.localizedDescription, preferredStyle: UIAlertControllerStyle.alert)
             alert.addAction(UIAlertAction(title: "OK", style: UIAlertActionStyle.cancel, handler: nil))
             UIApplication.topViewController().present(alert, animated: true, completion: nil)
             
@@ -66,7 +66,7 @@ class ExampleService: BackendService {
         
         operation.onFailure = {(error, status) in
             
-            let alert = UIAlertController(title: "Error", message: error?.localizedDescription, preferredStyle: UIAlertControllerStyle.alert)
+            let alert = UIAlertController(title: "Error", message: error.localizedDescription, preferredStyle: UIAlertControllerStyle.alert)
             alert.addAction(UIAlertAction(title: "OK", style: UIAlertActionStyle.cancel, handler: nil))
             UIApplication.topViewController().present(alert, animated: true, completion: nil)
             
@@ -87,7 +87,7 @@ class ExampleService: BackendService {
         
         operation.onFailure = { [weak self] (error, status) in
             
-            let alert = UIAlertController(title: "Error", message: error?.localizedDescription, preferredStyle: UIAlertControllerStyle.alert)
+            let alert = UIAlertController(title: "Error", message: error.localizedDescription, preferredStyle: UIAlertControllerStyle.alert)
             alert.addAction(UIAlertAction(title: "OK", style: UIAlertActionStyle.cancel, handler: nil))
             UIApplication.topViewController().present(alert, animated: true, completion: nil)
 

@@ -8,6 +8,15 @@
 
 import UIKit
 
+enum BackendRequestError : Error{
+    case missingDownloadFileId
+    case errorDownloadingFile
+    case missingUploadFileId
+    case errorCreatingTempFile
+    case errorCreatingURLRequest
+    case errorReadingFile
+}
+
 protocol BackendExecutorProtocol {
     
     func executeBackendRequest(backendRequest: BackendRequest, successCallback: @escaping BackendRequestSuccessCallback, failureCallback: @escaping BackendRequestFailureCallback)

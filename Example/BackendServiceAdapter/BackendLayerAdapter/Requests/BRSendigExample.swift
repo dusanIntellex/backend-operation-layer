@@ -19,6 +19,10 @@ class BRSendigExample : BackendRequest, PostDataProtocol, UploadFileProtocol{
         return "endpoint"
     }
     
+    func specificUrl() -> String?{
+        return nil
+    }
+    
     func method() -> HttpMethod {
         return .post
     }

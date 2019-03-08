@@ -24,6 +24,10 @@ class BRPostSampleRequest : NSObject, BackendRequest, SendingProtocols{
     var sendingModel: ExampleModelObject?
     
     func endpoint() -> String {
+        return ""
+    }
+    
+    func specificUrl() -> String?{
         return "https://jsonplaceholder.typicode.com/posts"
     }
     

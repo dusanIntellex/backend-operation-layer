@@ -94,7 +94,7 @@ class BackendAlamofireExecutor: NSObject, BackendExecutorProtocol {
             if _isDebugAssertConfiguration(){
                 print("You have not set file id within request. Backend request: \(backendRequest.endpoint()) need to implement Download File protocol")
             }
-            failureCallback(nil, 1001)
+            failureCallback(BackendRequestError.missingDownloadFileId, 1001)
             return
         }
         
@@ -132,7 +132,7 @@ class BackendAlamofireExecutor: NSObject, BackendExecutorProtocol {
                     if _isDebugAssertConfiguration(){
                         print("error downloading file - \(String(describing: response.error?.localizedDescription))")
                     }
-                    failureCallback(response.result.error, response.response?.statusCode ?? -1001)
+                    failureCallback(response.result.error ?? BackendRequestError.errorDownloadingFile, response.response?.statusCode ?? -1001)
                 }
         }
     }
@@ -150,7 +150,7 @@ class BackendAlamofireExecutor: NSObject, BackendExecutorProtocol {
             if _isDebugAssertConfiguration(){
                 print("You have not set upload file within request. Backend request: \(backendRequest.endpoint()) need to implement Upload File protocol")
             }
-            failureCallback(nil, 1001)
+            failureCallback(BackendRequestError.missingUploadFileId, 1001)
             return
         }
         
@@ -162,7 +162,7 @@ class BackendAlamofireExecutor: NSObject, BackendExecutorProtocol {
             if _isDebugAssertConfiguration(){
                 print("Can not create temp url path!. Upload file: \(file.name ?? "")")
             }
-            failureCallback(nil, 1001)
+            failureCallback(BackendRequestError.errorCreatingTempFile, 1001)
             return
         }
 
@@ -185,7 +185,7 @@ class BackendAlamofireExecutor: NSObject, BackendExecutorProtocol {
                     if _isDebugAssertConfiguration(){
                         print("error downloading file - \(String(describing: response.error?.localizedDescription))")
                     }
-                    failureCallback(response.result.error, response.response?.statusCode ?? -1001)
+                    failureCallback(response.result.error ?? BackendRequestError.errorDownloadingFile, response.response?.statusCode ?? -1001)
                 }
         }
     }
@@ -196,7 +196,7 @@ class BackendAlamofireExecutor: NSObject, BackendExecutorProtocol {
             if _isDebugAssertConfiguration(){
                 print("You have not set upload file within request. Backend request: \(backendRequest.endpoint()) need to implement Upload File protocol")
             }
-            failureCallback(nil, 1001)
+            failureCallback(BackendRequestError.missingUploadFileId, 1001)
             return
         }
         
@@ -214,7 +214,7 @@ class BackendAlamofireExecutor: NSObject, BackendExecutorProtocol {
             if _isDebugAssertConfiguration(){
                 print("Not able to create url request")
             }
-            failureCallback(nil, 1001)
+            failureCallback(BackendRequestError.errorCreatingURLRequest, 1001)
             return
         }
         
@@ -222,7 +222,7 @@ class BackendAlamofireExecutor: NSObject, BackendExecutorProtocol {
             if _isDebugAssertConfiguration(){
                 print("Can not create temp url path!. Upload file: \(file.name ?? "")")
             }
-            failureCallback(nil, 1001)
+            failureCallback(BackendRequestError.errorCreatingTempFile, 1001)
             return
         }
         
@@ -230,7 +230,7 @@ class BackendAlamofireExecutor: NSObject, BackendExecutorProtocol {
             if _isDebugAssertConfiguration(){
                 print("Can not read file from url path!. Upload file: \(file.name ?? "")")
             }
-            failureCallback(nil, 1001)
+            failureCallback(BackendRequestError.errorReadingFile, 1001)
             return
         }
         
@@ -283,6 +283,9 @@ class BackendAlamofireExecutor: NSObject, BackendExecutorProtocol {
     
     private func getUrl(backendRequest: BackendRequest) -> URL{
 
+        if let url = backendRequest.specificUrl(){
+            return URL(string: url)!
+        }
         let urlString = SERVER_URL.appending(backendRequest.endpoint())
         return URL(string: urlString)!
     }

@@ -49,7 +49,7 @@ class BackendRequestExecutor: NSObject, URLSessionTaskDelegate,URLSessionDelegat
         dataTask = session.dataTask(with: request, completionHandler: { (data, response, error) in
             
             if response == nil{
-                failureCallback(nil, 0)
+                failureCallback(ResponseError.serverError, 0)
                 return;
             }
             
@@ -68,7 +68,7 @@ class BackendRequestExecutor: NSObject, URLSessionTaskDelegate,URLSessionDelegat
             }
             
             if error != nil{
-                failureCallback(error, statusCode)
+                failureCallback(error!, statusCode)
             }
         })
         
@@ -87,7 +87,7 @@ class BackendRequestExecutor: NSObject, URLSessionTaskDelegate,URLSessionDelegat
             if _isDebugAssertConfiguration(){
                 print("You have not set file id within request. Backend request: \(backendRequest.endpoint()) need to implement Download File protocol")
             }
-            failureCallback(nil, 1001)
+            failureCallback(BackendRequestError.missingDownloadFileId, 1001)
             return
         }
         
@@ -117,7 +117,7 @@ class BackendRequestExecutor: NSObject, URLSessionTaskDelegate,URLSessionDelegat
             if _isDebugAssertConfiguration(){
                 print("You have not set file id within request. Backend request: \(backendRequest.endpoint()) need to implement Download File protocol")
             }
-            failureCallback(nil, 1001)
+            failureCallback(BackendRequestError.missingUploadFileId, 1001)
             return
         }
         
@@ -140,7 +140,7 @@ class BackendRequestExecutor: NSObject, URLSessionTaskDelegate,URLSessionDelegat
             if _isDebugAssertConfiguration(){
                 print("You have not set file id within request. Backend request: \(backendRequest.endpoint()) need to implement Download File protocol")
             }
-            failureCallback(nil, 1001)
+            failureCallback(BackendRequestError.missingUploadFileId, 1001)
             return
         }
         
@@ -203,10 +203,16 @@ class BackendRequestExecutor: NSObject, URLSessionTaskDelegate,URLSessionDelegat
     
     private func requestWithBackendRequest(backendRequest: BackendRequest) -> URLRequest{
         
-        let urlString = SERVER_URL.appending(backendRequest.endpoint())
-        let url = URL(string: urlString)
+        var url: URL!
+        if let specUrl = backendRequest.specificUrl(){
+            url = URL(string: specUrl)!
+        }
+        else{
+            let urlString = SERVER_URL.appending(backendRequest.endpoint())
+            url = URL(string: urlString)!
+        }
         
-        let request = NSMutableURLRequest(url: url!, cachePolicy: .reloadIgnoringLocalAndRemoteCacheData, timeoutInterval: timeoutInterval)
+        let request = NSMutableURLRequest(url: url, cachePolicy: .reloadIgnoringLocalAndRemoteCacheData, timeoutInterval: timeoutInterval)
         request.httpMethod = backendRequest.method().rawValue
         
         // Set header for specific server
@@ -352,7 +358,7 @@ class BackendRequestExecutor: NSObject, URLSessionTaskDelegate,URLSessionDelegat
         if error != nil{
             self.loadFile?.status = .fail
             
-            self.failureCallback?(error, statusCode)
+            self.failureCallback?(error!, statusCode)
             return
         }
         
@@ -371,12 +377,12 @@ class BackendRequestExecutor: NSObject, URLSessionTaskDelegate,URLSessionDelegat
         
         guard downloadTask.error == nil else{
             self.loadFile?.status = .fail
-            self.failureCallback?(downloadTask.error, statusCode!)
+            self.failureCallback?(downloadTask.error!, statusCode!)
             return
         }
         
         if downloadTask.response == nil{
-            self.failureCallback?(nil, 1001)
+            self.failureCallback?(BackendRequestError.errorDownloadingFile, 1001)
             return;
         }
         

@@ -16,6 +16,7 @@ import UIKit
 
 enum ResponseError : Error, Equatable{
     case noInternetConnection
+    case requestCancel
     case authorizationError
     case serverMessageError(String)
     case unknownError
@@ -25,18 +26,6 @@ enum ResponseError : Error, Equatable{
     case badLoginCredentials
     case invalidRegisterInputData([String])
 }
-
-var registerInvalidDataDict =
-    [
-        101:NSLocalizedString("invalid email", comment:""),
-        102:NSLocalizedString("existing email", comment:""),
-        201:NSLocalizedString("invalid username", comment:""),
-        202:NSLocalizedString("existing username", comment:""),
-        301:NSLocalizedString("invalid city", comment:""),
-        401:NSLocalizedString("invalid birthday", comment:""),
-        501:NSLocalizedString("invalid password", comment:"")
-]
-
 
 extension ResponseError : LocalizedError{
     
@@ -67,6 +56,8 @@ extension ResponseError : LocalizedError{
                 mutatingresult.append(nextError)
                 return mutatingresult
             })
+        case .requestCancel:
+            return NSLocalizedString("Request cancel", comment: "")
         }
     }
 }
@@ -108,12 +99,6 @@ public class BackendOperation: AsyncOperation {
         if let _ = request as? UploadFileProtocol, uploadFile != nil{
             (self.request as! UploadFileProtocol).uploadFile = uploadFile!
         }
-    }
-
-    
-    func isSingleton() -> Bool{
-        
-        return false
     }
     
     //MARK:- Start
@@ -192,7 +177,7 @@ public class BackendOperation: AsyncOperation {
         self.executor.cancel()
         
         if (self.onFailure != nil){
-            onFailure!(nil,0)
+            onFailure!(ResponseError.requestCancel,0)
         }
     }
     
@@ -232,9 +217,8 @@ public class BackendOperation: AsyncOperation {
     func handleFailure(error: Error?, statusCode: NSInteger){
         
         if self.onFailure != nil{
-            self.onFailure!(error, statusCode)
+            self.onFailure!(error ?? ResponseError.unknownError , statusCode)
         }
-        
         self.finish()
     }
 

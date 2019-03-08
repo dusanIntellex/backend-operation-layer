@@ -86,6 +86,7 @@ public protocol BackgroundModeProtocol { }
 public protocol BackendRequest {
     
     func endpoint() -> String
+    func specificUrl() -> String?
     func method() -> HttpMethod
     func headers() -> Dictionary<String, String>?
     

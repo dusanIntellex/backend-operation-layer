@@ -43,4 +43,6 @@ TODO: Add long description of the pod here.
   # s.frameworks = 'UIKit', 'MapKit'
    s.dependency 'Alamofire', '~> 4.5'
    s.dependency 'Kingfisher', '~> 4.1'
+   s.dependency 'RxSwift', '~> 4.3'
+   
 end

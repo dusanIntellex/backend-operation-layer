@@ -3,6 +3,7 @@ PODS:
   - BackendServiceAdapter (0.1.0):
     - Alamofire (~> 4.5)
     - Kingfisher (~> 4.1)
+    - RxSwift (~> 4.3)
   - FBSnapshotTestCase (2.1.4):
     - FBSnapshotTestCase/SwiftSupport (= 2.1.4)
   - FBSnapshotTestCase/Core (2.1.4)
@@ -16,6 +17,9 @@ PODS:
     - FBSnapshotTestCase (~> 2.0)
     - Nimble (~> 7.0)
   - Quick (1.2.0)
+  - RxAtomic (4.4.0)
+  - RxSwift (4.4.0):
+    - RxAtomic (~> 4.4)
 
 DEPENDENCIES:
   - BackendServiceAdapter (from `../`)
@@ -32,6 +36,8 @@ SPEC REPOS:
     - Nimble
     - Nimble-Snapshots
     - Quick
+    - RxAtomic
+    - RxSwift
 
 EXTERNAL SOURCES:
   BackendServiceAdapter:
@@ -39,12 +45,14 @@ EXTERNAL SOURCES:
 
 SPEC CHECKSUMS:
   Alamofire: c7287b6e5d7da964a70935e5db17046b7fde6568
-  BackendServiceAdapter: d8eb8620c70309772d7c35a13efb1059138bf8f4
+  BackendServiceAdapter: 72789ece7a9dafff42ba564c6bc0c4b28f834f91
   FBSnapshotTestCase: 094f9f314decbabe373b87cc339bea235a63e07a
   Kingfisher: c148cd7b47ebde9989f6bc7c27dcaa79d81279a0
   Nimble: 7f5a9c447a33002645a071bddafbfb24ea70e0ac
   Nimble-Snapshots: f5459b5b091678dc942d03ec4741cacb58ba4a52
   Quick: 58d203b1c5e27fff7229c4c1ae445ad7069a7a08
+  RxAtomic: eacf60db868c96bfd63320e28619fe29c179656f
+  RxSwift: 5976ecd04fc2fefd648827c23de5e11157faa973
 
 PODFILE CHECKSUM: 09ee768dd3a6e51d0511c4172a03e425a0849f3c
 

@@ -18,6 +18,10 @@ class BRDownloadExample: BackendRequest, DownloadFileProtocol, BackgroundModePro
     }
     
     func endpoint() -> String {
+        return ""
+    }
+    
+    func specificUrl() -> String?{
         return "http://ipv4.download.thinkbroadband.com/5MB.zip"
     }
     

@@ -13,6 +13,10 @@ import BackendServiceAdapter
 class BRRestSampleRequest: NSObject , BackendRequest{
     
     func endpoint() -> String {
+        return ""
+    }
+    
+    func specificUrl() -> String?{
         return "https://jsonplaceholder.typicode.com/posts/1"
     }
     

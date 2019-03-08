@@ -9,7 +9,7 @@
 import Foundation
 
 public typealias BackendRequestSuccessCallback = (_ data: Any?,_ statusCode: NSInteger) -> Void
-public typealias BackendRequestFailureCallback = (_ error: Error?,_ statusCode: NSInteger) -> Void
+public typealias BackendRequestFailureCallback = (_ error: Error,_ statusCode: NSInteger) -> Void
 public typealias FinishCallback = () -> Void
 public typealias SuccessCallback = (_ success: Bool) -> Void
 public typealias ErrorCallback = (_ error: Error) -> Void
