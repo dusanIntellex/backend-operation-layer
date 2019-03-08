@@ -6,68 +6,38 @@
 //  Copyright © 2018 Quantox. All rights reserved.
 //
 
-import Foundation
 import UIKit
 import Photos
 import MobileCoreServices
+import Kingfisher
 
 public typealias FileUploadHandler = ((FileLoad?) -> ())
+let IMAGE_MAX_SIZE = 2000 // size in KB
 
 public class ImageUploadHelper: NSObject {
 
-    static var fileUpload: FileUploadHandler?
-    
-    static func getDataFromLibraryItem(url: URL, response: @escaping (_ data: Data?) -> Void) {
+    enum ImageUploadError: Error{
+        case imagesaveError(String)
         
-        if let phAsset = PHAsset.fetchAssets(withALAssetURLs: [url], options: nil).lastObject{
-            
-            PHImageManager.default().requestImageData(for: phAsset, options: nil) { (data, _, _, _) in
-                
-                response(data)
-            }
-        }
-        else{
-            response(nil)
-        }
     }
     
-    public static func createUploadFile(imageInfo: [String: Any], imageSource: UIImagePickerControllerSourceType, response: @escaping FileUploadHandler){
+    public static var fileUpload: FileUploadHandler?
+    static var errorHandler: ErrorCallback!
+    
+    public static func createUploadFile(imageInfo: [String : Any], imageSource: UIImagePickerController.SourceType, response: @escaping FileUploadHandler, error: @escaping ErrorCallback) {
         
         fileUpload = response
-        if imageSource == .camera{
-            storeFile(info: imageInfo)
-        }
-        else{
-            createFileFromLibraryImage(info: imageInfo)
-        }
+        errorHandler = error
+        storeFile(info: imageInfo)
     }
     
-    private static func createFileFromLibraryImage(info: [String: Any]){
-        
-        let imageUrl = info[UIImagePickerControllerPHAsset]
-        imageFromAssetURL(assetURL: imageUrl as! URL)
-    }
-    
-    static func imageFromAssetURL(assetURL: URL) {
-        
-        let asset = PHAsset.fetchAssets(withALAssetURLs: [assetURL], options: nil)
-        if asset.count != 0{
-            getUrl(asset: asset.firstObject!)
-        }
-    }
-    
-    private static func storeFile(info : [String: Any]){
+    private static func storeFile(info : [String : Any]){
         
         let mediaType = info[UIImagePickerControllerMediaType] as! NSString
         
         if mediaType.isEqual(to: kUTTypeImage as String) {
-            
             let image = info[UIImagePickerControllerEditedImage] as! UIImage
-            UIImageWriteToSavedPhotosAlbum(image, self, #selector(self.image(_:didFinishSavingWithError:contextInfo:)), nil)
-        }
-        else if mediaType.isEqual(to: kUTTypeVideo as String) || mediaType.isEqual(to: kUTTypeMovie as String){
-            let videoURL = info[UIImagePickerControllerMediaURL]as? NSURL
-            UISaveVideoAtPathToSavedPhotosAlbum((videoURL?.path)!, self, #selector(self.video(_:didFinishSavingWithError:contextInfo:)), nil)
+            UIImageWriteToSavedPhotosAlbum(resizeImage(image: image), self, #selector(self.image(_:didFinishSavingWithError:contextInfo:)), nil)
         }
         else{
             if fileUpload != nil{
@@ -78,27 +48,9 @@ public class ImageUploadHelper: NSObject {
     
     @objc static func image(_ image: UIImage, didFinishSavingWithError error: NSError?, contextInfo: UnsafeRawPointer) {
         if let error = error {
-            
-            print(error.localizedDescription)
-            
-            if fileUpload != nil{
-                fileUpload!(nil)
-            }
+            errorHandler(error)
         } else {
             fetchLastImage()
-        }
-    }
-    
-    @objc static func video(_ videoPath: String, didFinishSavingWithError error: NSError?, contextInfo: UnsafeRawPointer) {
-
-        let videoUrl = NSURL(fileURLWithPath: videoPath)
-        
-        do{
-            let videoData = try Data(contentsOf: videoUrl as URL)
-            createFileUpload(url: videoUrl as URL, data: videoData, mediaType: "video")
-        }
-        catch{
-            print("Error:\(error.localizedDescription)")
         }
     }
     
@@ -138,8 +90,8 @@ public class ImageUploadHelper: NSObject {
                 return
             }
             
-            if let url = info!["PHImageFileURLKey"] as? NSURL {
-                createFileUpload(url: url as URL, data: data, mediaType:"image")
+            if let _ = info!["PHImageFileURLKey"] as? NSURL {
+                createFileUpload(info: info!, data: data)
             }
             else{
                 if fileUpload != nil{
@@ -149,27 +101,43 @@ public class ImageUploadHelper: NSObject {
         }
     }
     
-    private static func createFileUpload(url : URL, data : Data?, mediaType: String){
+    private static func createFileUpload(info: [AnyHashable: Any], data : Data?){
         
-        var fileExt = ""
-        var fileName = ""
-        let parts = url.lastPathComponent.components(separatedBy: ".")
-        if parts.count > 1{
-            fileName = parts[0]
-            fileExt = parts[1]
+
+        if let url = info["PHImageFileURLKey"] as? NSURL{
+            var fileExt = ""
+            var fileName = ""
+            if let parts = url.lastPathComponent?.components(separatedBy: "."){
+                if parts.count > 1{
+                    fileName = parts[0]
+                    fileExt = parts[1]
+                }
+            }
+            
+            let file = FileLoad(fileName: fileName, path: url as URL, fileExtension: fileExt, fileId: url.lastPathComponent ?? "")
+            file.data = data
+            file.type = "image"
+            
+            if fileUpload != nil{
+                fileUpload!(file)
+            }
+        }
+        else{
+            if fileUpload != nil{
+                fileUpload!(nil)
+            }
+        }
+    }
+    
+    private static func resizeImage(image: UIImage) -> UIImage{
+        
+        var resizeImage = image
+        
+        while (UIImagePNGRepresentation(resizeImage)!.count / 1024) > IMAGE_MAX_SIZE{
+            let resizeScale = resizeImage.scale - 0.1
+            resizeImage = image.kf.resize(to: CGSize(width: resizeImage.size.width * resizeScale, height: resizeImage.size.height * resizeScale), for: .aspectFill)
         }
         
-        let time = ".\(Date().timeIntervalSince1970)"
-        let id = url.lastPathComponent
-        let file = FileLoad(fileId: id + time)
-        file.path = url as URL
-        file.data = data
-        file.fileExtension = fileExt
-        file.name = fileName
-        file.type = mediaType
-        
-        if fileUpload != nil{
-            fileUpload!(file)
-        }
+        return resizeImage
     }
 }

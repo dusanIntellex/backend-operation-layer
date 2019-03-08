@@ -23,6 +23,9 @@
   "dependencies": {
     "Alamofire": [
       "~> 4.5"
+    ],
+    "Kingfisher": [
+      "~> 4.1"
     ]
   }
 }

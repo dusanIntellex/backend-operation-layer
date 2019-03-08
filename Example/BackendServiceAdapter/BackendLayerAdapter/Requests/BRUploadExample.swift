@@ -9,12 +9,12 @@
 import UIKit
 import BackendServiceAdapter
 
-class BRUploadExample : BackendRequest, UploadFileProtocol {
-    
+class BRUploadExample : BackendRequest, UploadFileProtocol{
+
     var uploadFile: FileLoad?
     
     func endpoint() -> String {
-//        return "https://www.googleapis.com/upload/drive/v3/files?uploadType=media"
+        //        return "https://www.googleapis.com/upload/drive/v3/files?uploadType=media"
         return "https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart"
     }
     
@@ -23,20 +23,21 @@ class BRUploadExample : BackendRequest, UploadFileProtocol {
     }
     
     func headers() -> Dictionary<String, String>? {
-//        let token = GIDSignIn.sharedInstance().currentUser.authentication.accessToken ?? ""
-//        print(token)
+        //        let token = GIDSignIn.sharedInstance().currentUser.authentication.accessToken ?? ""
+        //        print(token)
         return ["Authorization" : "Bearer \("token")",
-                "Content-Type": "multipart/related; boundary=foo_bar_baz"]
+            "Content-Type": "multipart/related; boundary=foo_bar_baz"]
     }
     
     func requestType() -> RequestType? {
         return .upload
     }
     
-    func encodingType() -> ParametersEncodingType? {
+    func params() -> [String : Any]? {
         return nil
     }
     
-    func setSendingData(_ sendingData: Encodable) {
+    func encodingType() -> ParametersEncodingType? {
+        return nil
     }
 }

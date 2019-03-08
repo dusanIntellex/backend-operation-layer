@@ -15,13 +15,14 @@ class BackendRequestExecutor: NSObject, URLSessionTaskDelegate,URLSessionDelegat
     }
     
     let timeoutInterval = 60.0
-    private lazy var regularSession: URLSession = { [unowned self] in
+    private lazy var regularSession: URLSession = { [weak self] in
         
         let config = URLSessionConfiguration.default
         return URLSession(configuration: config, delegate: self, delegateQueue: OperationQueue.main)
         }()
     
-    private lazy var backgroundSession: URLSession = { [unowned self] in
+    private lazy var backgroundSession: URLSession = { [weak self] in
+        
         let config = URLSessionConfiguration.background(withIdentifier: Constant.sessionID.rawValue + ".\(Date().timeIntervalSince1970)")
         //        config.isDiscretionary = true
         config.sessionSendsLaunchEvents = true
@@ -223,7 +224,11 @@ class BackendRequestExecutor: NSObject, URLSessionTaskDelegate,URLSessionDelegat
         
         var params : [String : Any]?
         
-        if let request = backendRequest as? ManagePostDataProtocol {
+        if let requestParams = backendRequest.params(){
+            
+            params = requestParams
+        }
+        else if let request = backendRequest as? ManagePostDataProtocol {
             
             if let encodedParams = request.getEncodedData(){
                 params = encodedParams
@@ -233,8 +238,10 @@ class BackendRequestExecutor: NSObject, URLSessionTaskDelegate,URLSessionDelegat
             }
         }
         
+        
+        
         // Set params
-        if let encodingType = (backendRequest as? ManagePostDataProtocol)?.encodingType(), params != nil {
+        if let encodingType = backendRequest.encodingType(), params != nil {
             
             switch encodingType{
                 
@@ -267,7 +274,15 @@ class BackendRequestExecutor: NSObject, URLSessionTaskDelegate,URLSessionDelegat
         }
         
         if _isDebugAssertConfiguration(){
-            print("\nBackend service request:\nEndpoint:\(backendRequest.endpoint())\nURL:\(request.url?.absoluteString ?? "")\nMethod:\(request.httpMethod)\nEncoding:\(String(describing: (backendRequest as? ManagePostDataProtocol)?.encodingType().debugDescription))\nHeaders:\(String(describing: request.allHTTPHeaderFields)))\nParams:\(String(describing: params))")
+            print("""
+                \nBackend service request:
+                \nEndpoint:\(backendRequest.endpoint())
+                \nURL:\(request.url?.absoluteString ?? "")
+                \nMethod:\(request.httpMethod)
+                \nEncoding:\(String(describing: backendRequest.encodingType().debugDescription))
+                \nHeaders:\(String(describing: request.allHTTPHeaderFields)))
+                \nParams:\(String(describing: params))
+                """)
         }
         
         return request as URLRequest

@@ -14,9 +14,29 @@ import UIKit
  To use different backend executors (Firebase, native iOS URLSession, Alamofire) just change class of executor
 */
 
-enum ResponseError : Error{
+enum ResponseError : Error, Equatable{
     case noInternetConnection
+    case authorizationError
+    case serverMessageError(String)
+    case unknownError
+    case serverError
+    case invalidData
+    case verifyEmail
+    case badLoginCredentials
+    case invalidRegisterInputData([String])
 }
+
+var registerInvalidDataDict =
+    [
+        101:NSLocalizedString("invalid email", comment:""),
+        102:NSLocalizedString("existing email", comment:""),
+        201:NSLocalizedString("invalid username", comment:""),
+        202:NSLocalizedString("existing username", comment:""),
+        301:NSLocalizedString("invalid city", comment:""),
+        401:NSLocalizedString("invalid birthday", comment:""),
+        501:NSLocalizedString("invalid password", comment:"")
+]
+
 
 extension ResponseError : LocalizedError{
     
@@ -24,6 +44,29 @@ extension ResponseError : LocalizedError{
         switch self {
         case .noInternetConnection:
             return NSLocalizedString("No internet connection", comment: "")
+        case .authorizationError:
+            return NSLocalizedString("You are not authorized for this action", comment: "")
+        case .serverMessageError(let message):
+            return message
+        case .unknownError:
+            return NSLocalizedString("There is error. Please try again!", comment: "")
+        case .serverError:
+            return NSLocalizedString("We are currently working on this. Try again later.", comment: "")
+        case .invalidData:
+            return NSLocalizedString("Invalid data", comment: "")
+        case .verifyEmail:
+            return NSLocalizedString("Need to verify email", comment: "")
+        case .badLoginCredentials:
+            return NSLocalizedString("Invalid credentials", comment: "")
+        case .invalidRegisterInputData(let errorList):
+            return errorList.reduce("", { (result, nextError) -> String in
+                var mutatingresult = result
+                if mutatingresult.count > 0{
+                    mutatingresult.append("'n'")
+                }
+                mutatingresult.append(nextError)
+                return mutatingresult
+            })
         }
     }
 }
@@ -85,7 +128,7 @@ public class BackendOperation: AsyncOperation {
             }
             
             self.finish()
-            // TODO: Handle internet connection
+
             return
         }
         
@@ -158,33 +201,38 @@ public class BackendOperation: AsyncOperation {
     
     func handleSuccess(data: Any?, statusCode: NSInteger){
         
-        DispatchQueue.main.async { [weak self] in
+        // TODO: For any special handling of status code, do this here!!
+        if self.onSuccess != nil{
             
-            
-            // TODO: For any special handling of status code, do this here!!
-            if self?.onSuccess != nil{
-                
-                if 200 <= statusCode && statusCode < 300{
-        
-                    self?.onSuccess!(data, statusCode)
-                }
-                else{
-                    self?.onSuccess!(nil, statusCode)
-                }
+            if 200 ... 299 ~= statusCode{
+                self.onSuccess!(data, statusCode)
             }
-            
-            self?.finish()
+            else if statusCode == 400{
+                self.onFailure?(ResponseError.badLoginCredentials, statusCode)
+            }
+            // Refresh token
+            else if statusCode == 401{
+                self.refreshToken()
+                return
+            }
+            else if statusCode == 403{
+                self.onFailure?(ResponseError.verifyEmail, statusCode)
+            }
+            else if statusCode >= 500{
+                self.onFailure?(ResponseError.serverError, statusCode)
+            }
+            else{
+                self.onFailure?(ResponseError.unknownError, statusCode)
+            }
         }
+        
+        self.finish()
     }
     
     func handleFailure(error: Error?, statusCode: NSInteger){
         
-        DispatchQueue.main.async { [weak self] in
-            
-            if self?.onFailure != nil{
-                
-                self?.onFailure!(error, statusCode)
-            }
+        if self.onFailure != nil{
+            self.onFailure!(error, statusCode)
         }
         
         self.finish()
@@ -195,6 +243,6 @@ public class BackendOperation: AsyncOperation {
     
     func refreshToken(){
         
-        //TODO: refresh token if there is need adn add it to handling status code
+        //Refresh token if there is need adn add it to handling status code
     }
 }

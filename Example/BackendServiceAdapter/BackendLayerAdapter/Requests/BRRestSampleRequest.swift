@@ -9,6 +9,7 @@
 import UIKit
 import BackendServiceAdapter
 
+
 class BRRestSampleRequest: NSObject , BackendRequest{
     
     func endpoint() -> String {
@@ -25,5 +26,13 @@ class BRRestSampleRequest: NSObject , BackendRequest{
     
     func requestType() -> RequestType? {
         return .rest
+    }
+    
+    func params() -> [String : Any]? {
+        return nil
+    }
+    
+    func encodingType() -> ParametersEncodingType? {
+        return nil
     }
 }

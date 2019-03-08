@@ -233,7 +233,6 @@
 				607FACCD1AFB9204008FA782 /* Frameworks */,
 				607FACCE1AFB9204008FA782 /* Resources */,
 				036316ABC62A9356B410C2E7 /* [CP] Embed Pods Frameworks */,
-				4BA34DDDE67D0063EA3BBFBA /* [CP] Copy Pods Resources */,
 			);
 			buildRules = (
 			);
@@ -253,7 +252,6 @@
 				607FACE21AFB9204008FA782 /* Frameworks */,
 				607FACE31AFB9204008FA782 /* Resources */,
 				69BCA8AFB2CEB9068AEB9EA5 /* [CP] Embed Pods Frameworks */,
-				763AF1F2C7F3AF3B2BAB574F /* [CP] Copy Pods Resources */,
 			);
 			buildRules = (
 			);
@@ -336,30 +334,17 @@
 				"${SRCROOT}/Pods/Target Support Files/Pods-BackendServiceAdapter_Example/Pods-BackendServiceAdapter_Example-frameworks.sh",
 				"${BUILT_PRODUCTS_DIR}/Alamofire/Alamofire.framework",
 				"${BUILT_PRODUCTS_DIR}/BackendServiceAdapter/BackendServiceAdapter.framework",
+				"${BUILT_PRODUCTS_DIR}/Kingfisher/Kingfisher.framework",
 			);
 			name = "[CP] Embed Pods Frameworks";
 			outputPaths = (
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/Alamofire.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/BackendServiceAdapter.framework",
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/Kingfisher.framework",
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
 			shellScript = "\"${SRCROOT}/Pods/Target Support Files/Pods-BackendServiceAdapter_Example/Pods-BackendServiceAdapter_Example-frameworks.sh\"\n";
-			showEnvVarsInLog = 0;
-		};
-		4BA34DDDE67D0063EA3BBFBA /* [CP] Copy Pods Resources */ = {
-			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputPaths = (
-			);
-			name = "[CP] Copy Pods Resources";
-			outputPaths = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "\"${SRCROOT}/Pods/Target Support Files/Pods-BackendServiceAdapter_Example/Pods-BackendServiceAdapter_Example-resources.sh\"\n";
 			showEnvVarsInLog = 0;
 		};
 		522316740536DEAD9D641F4D /* [CP] Check Pods Manifest.lock */ = {
@@ -402,24 +387,6 @@
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
 			shellScript = "\"${SRCROOT}/Pods/Target Support Files/Pods-BackendServiceAdapter_Tests/Pods-BackendServiceAdapter_Tests-frameworks.sh\"\n";
-			showEnvVarsInLog = 0;
-		};
-		763AF1F2C7F3AF3B2BAB574F /* [CP] Copy Pods Resources */ = {
-			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputPaths = (
-				"${SRCROOT}/Pods/Target Support Files/Pods-BackendServiceAdapter_Tests/Pods-BackendServiceAdapter_Tests-resources.sh",
-				"${PODS_ROOT}/GoogleSignIn/Resources/GoogleSignIn.bundle",
-			);
-			name = "[CP] Copy Pods Resources";
-			outputPaths = (
-				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/GoogleSignIn.bundle",
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "\"${SRCROOT}/Pods/Target Support Files/Pods-BackendServiceAdapter_Tests/Pods-BackendServiceAdapter_Tests-resources.sh\"\n";
 			showEnvVarsInLog = 0;
 		};
 		8005F35FFBE1F35CF50D2DF3 /* [CP] Check Pods Manifest.lock */ = {

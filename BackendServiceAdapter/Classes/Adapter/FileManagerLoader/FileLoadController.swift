@@ -16,18 +16,10 @@ public class FileLoadController: NSObject {
     public var file: FileLoad?
     var handler : FileObserverHandler?
     var keyPaths = [#keyPath(FileLoad.progress), #keyPath(FileLoad.status)]
-    lazy var addedKeyPaths : [Any] = {
-        return Array<Any>()
-    }()
     
     
-    convenience public init(operation: BackendOperation){
-        
-        guard let fileId = (operation.request as? DownloadFileProtocol)?.fileId else{
-            fatalError("Adopt DownloadFileProtocol and set fileId")
-        }
-        
-        self.init(fileId: fileId)
+    public override init() {
+        super.init()    
     }
     
     public init(fileId: String) {
@@ -47,7 +39,6 @@ public class FileLoadController: NSObject {
         for path in keyPaths{
         
             file?.addObserver(self, forKeyPath: path, options: .new, context: nil)
-            addedKeyPaths.append(path)
         }
         
         handler = fileHandler
@@ -55,42 +46,24 @@ public class FileLoadController: NSObject {
     
     deinit {
         
-        for path in addedKeyPaths{
-            file?.removeObserver(self, forKeyPath: path as! String)
+        for path in keyPaths{
+            
+            file?.removeObserver(self, forKeyPath: path)
         }
     }
     
-    public func unsubscribe(from operation: BackendOperation, removeFromPool: Bool){
-        
-        if let fileId = (operation.request as? DownloadFileProtocol)?.fileId{
-            unsubscribe(fileId: fileId, removeFromPool: removeFromPool)
-        }
-        else{
-            print("Not able to get file id from request")
+    public func unsubscribeAll(){
+        for path in keyPaths{   
+            file?.removeObserver(self, forKeyPath: path)
         }
     }
     
-    public func unsubscribe(fileId: String, removeFromPool: Bool){
+    public func unsubscribe(fileId: String){
         
-        for path in addedKeyPaths{
+        for path in keyPaths{
             
-            file?.removeObserver(self, forKeyPath: path as! String)
-            
-            if removeFromPool{
-                FilesPool.sharedInstance.pool?.enumerated().forEach{
-                    if $0.element.fileId == file?.fileId{
-                        if $0.offset < (FilesPool.sharedInstance.pool?.count)!{
-                            FilesPool.sharedInstance.pool?.remove(at: $0.offset)
-                        }
-                        else{
-                            assertionFailure("Something wrong with this pool. Check this!!!")
-                        }
-                    }
-                }
-            }
+            file?.removeObserver(self, forKeyPath: path)
         }
-        
-        addedKeyPaths.removeAll()
     }
 
     override public func observeValue(forKeyPath keyPath: String?, of object: Any?, change: [NSKeyValueChangeKey : Any]?, context: UnsafeMutableRawPointer?) {

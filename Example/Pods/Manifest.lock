@@ -2,11 +2,13 @@ PODS:
   - Alamofire (4.7.3)
   - BackendServiceAdapter (0.1.0):
     - Alamofire (~> 4.5)
+    - Kingfisher (~> 4.1)
   - FBSnapshotTestCase (2.1.4):
     - FBSnapshotTestCase/SwiftSupport (= 2.1.4)
   - FBSnapshotTestCase/Core (2.1.4)
   - FBSnapshotTestCase/SwiftSupport (2.1.4):
     - FBSnapshotTestCase/Core
+  - Kingfisher (4.10.1)
   - Nimble (7.0.3)
   - Nimble-Snapshots (6.3.0):
     - Nimble-Snapshots/Core (= 6.3.0)
@@ -22,18 +24,28 @@ DEPENDENCIES:
   - Nimble-Snapshots (~> 6.3.0)
   - Quick (~> 1.2.0)
 
+SPEC REPOS:
+  https://github.com/cocoapods/specs.git:
+    - Alamofire
+    - FBSnapshotTestCase
+    - Kingfisher
+    - Nimble
+    - Nimble-Snapshots
+    - Quick
+
 EXTERNAL SOURCES:
   BackendServiceAdapter:
-    :path: ../
+    :path: "../"
 
 SPEC CHECKSUMS:
   Alamofire: c7287b6e5d7da964a70935e5db17046b7fde6568
-  BackendServiceAdapter: 04e2a5f3f644056936039cb80d4a8534b9e7bfa7
+  BackendServiceAdapter: d8eb8620c70309772d7c35a13efb1059138bf8f4
   FBSnapshotTestCase: 094f9f314decbabe373b87cc339bea235a63e07a
+  Kingfisher: c148cd7b47ebde9989f6bc7c27dcaa79d81279a0
   Nimble: 7f5a9c447a33002645a071bddafbfb24ea70e0ac
   Nimble-Snapshots: f5459b5b091678dc942d03ec4741cacb58ba4a52
   Quick: 58d203b1c5e27fff7229c4c1ae445ad7069a7a08
 
 PODFILE CHECKSUM: 09ee768dd3a6e51d0511c4172a03e425a0849f3c
 
-COCOAPODS: 1.4.0
+COCOAPODS: 1.5.3

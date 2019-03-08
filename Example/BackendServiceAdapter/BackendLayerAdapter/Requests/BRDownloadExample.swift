@@ -9,6 +9,39 @@
 import UIKit
 import BackendServiceAdapter
 
+class BRDownloadExample: BackendRequest, DownloadFileProtocol, BackgroundModeProtocol{
+    
+    var fileId: String
+    
+    init() {
+        self.fileId = "downloadFile\(Date().timeIntervalSince1970)"
+    }
+    
+    func endpoint() -> String {
+        return "http://ipv4.download.thinkbroadband.com/5MB.zip"
+    }
+    
+    func method() -> HttpMethod {
+        return .get
+    }
+    
+    func headers() -> Dictionary<String, String>? {
+        return nil
+    }
+    
+    func requestType() -> RequestType? {
+        return .download
+    }
+    
+    func params() -> [String : Any]? {
+        return nil
+    }
+    
+    func encodingType() -> ParametersEncodingType? {
+        return nil
+    }
+}
+/*
 class BRDownloadExample: BackendRequest, DownloadFileProtocol, BackgroundModeProtocol {
     
     var fileId: String
@@ -38,3 +71,4 @@ class BRDownloadExample: BackendRequest, DownloadFileProtocol, BackgroundModePro
         return .download
     }
 }
+*/

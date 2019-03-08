@@ -15,7 +15,7 @@ class BackendAlamofireExecutor: NSObject, BackendExecutorProtocol {
         case sessionID = "quantox.com.BackendLayerDemo.bgSession"
     }
     
-    let timeoutInterval = 60.0
+    let timeoutInterval = 30.0
     private lazy var regularSession: SessionManager = { [unowned self] in
         
         let config = URLSessionConfiguration.default
@@ -73,7 +73,7 @@ class BackendAlamofireExecutor: NSObject, BackendExecutorProtocol {
             }
             else{
                 
-                failureCallback(response.error,statusCode ?? 0)
+                failureCallback(ResponseError.serverError,statusCode ?? 0)
             }
         }
         
@@ -81,7 +81,7 @@ class BackendAlamofireExecutor: NSObject, BackendExecutorProtocol {
     }
     
     
-    /// Donwload file
+    /// Download file
     ///
     /// - Parameters:
     ///   - backendRequest: <#backendRequest description#>
@@ -320,7 +320,7 @@ class BackendAlamofireExecutor: NSObject, BackendExecutorProtocol {
     /// - Returns: ParameterEncoding (Alamofire enum)
     private func getEncodingType(backendRequest: BackendRequest) -> ParameterEncoding{
         
-        if let paramsEncodingType = (backendRequest as? ManagePostDataProtocol)?.encodingType(){
+        if let paramsEncodingType = backendRequest.encodingType(){
             
             switch paramsEncodingType{
                 
@@ -338,6 +338,10 @@ class BackendAlamofireExecutor: NSObject, BackendExecutorProtocol {
     }
     
     private func getParams(backendRequest: BackendRequest) -> [String : Any]{
+        
+        if let params = backendRequest.params() {
+            return params
+        }
         
         guard let params = (backendRequest as? ManagePostDataProtocol)?.getEncodedData()  else {
             return [String:Any]()

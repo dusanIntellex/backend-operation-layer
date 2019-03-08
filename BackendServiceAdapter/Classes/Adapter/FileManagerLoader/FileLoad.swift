@@ -48,11 +48,6 @@ public class FileLoad: NSObject {
 //    public var process: UploadRequest?
     
     // MARK:- Constructor
-    public override init() {
-        super.init()
-        
-        FilesPool.sharedInstance.pool?.append(self)
-    }
     
     init(fileId: String) {
         super.init()
@@ -61,13 +56,19 @@ public class FileLoad: NSObject {
         FilesPool.sharedInstance.pool?.append(self)
     }
     
-    deinit {
-        FilesPool.sharedInstance.pool?.enumerated().forEach{
-            if $0.element.fileId == self.fileId{
-                FilesPool.sharedInstance.pool?.remove(at: $0.offset)
-                return
-            }
-        }
+    init(fileData: Data, fileId: String){
+        super.init()
+        self.data = fileData
+        self.fileId = fileId
+        FilesPool.sharedInstance.pool?.append(self)
+    }
+    
+    init(fileName: String, path: URL, fileExtension: String, fileId: String) {
+        super.init()
+        self.name = fileName
+        self.path = path
+        self.fileExtension = fileExtension
+        self.fileId = fileId
     }
     
     /// Return file with id from pool array. If not exsist create new file

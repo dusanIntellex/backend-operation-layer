@@ -25,7 +25,6 @@ class FilesPool: NSObject {
         
         pool = array
     }
-
     
     // TODO: Cache settings
 }

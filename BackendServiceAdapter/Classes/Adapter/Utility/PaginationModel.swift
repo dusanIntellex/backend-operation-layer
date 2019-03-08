@@ -17,6 +17,15 @@ public struct PaginationModel: Codable {
     var totalPages: Int?
     var links:[String]?
    
+    var limit : Int!
+    var offset : Int!
+    var hasNextPage: Bool!
+    
+    init(offset: Int? = nil) {
+        self.limit = 100
+        self.offset = offset ?? 0
+        self.hasNextPage = true
+    }
     /*
     enum CodingKeys: String, CodingKey {
         case total

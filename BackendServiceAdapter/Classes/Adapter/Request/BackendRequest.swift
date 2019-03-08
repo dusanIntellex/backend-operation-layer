@@ -59,11 +59,6 @@ public protocol ManagePostDataProtocol {
     
     func setSendingData(data: Encodable)
     func getEncodedData() -> [String: Any]?
-    
-    /// Type which define how will parameters be encoded
-    ///
-    /// - Returns: Enum values of enciding type
-    func encodingType() -> ParametersEncodingType?
 }
 
 public extension PostDataProtocol{
@@ -93,6 +88,13 @@ public protocol BackendRequest {
     func endpoint() -> String
     func method() -> HttpMethod
     func headers() -> Dictionary<String, String>?
+    
+    func params() -> [String: Any]?
+    
+    /// Type which define how will parameters be encoded
+    ///
+    /// - Returns: Enum values of enciding type
+    func encodingType() -> ParametersEncodingType?
     
     /// Return what type of request is
     ///

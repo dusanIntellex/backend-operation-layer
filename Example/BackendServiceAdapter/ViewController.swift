@@ -101,13 +101,17 @@ class ViewController: UIViewController , UIImagePickerControllerDelegate, UINavi
     }
     
     func imagePickerController(_ picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [String : Any]) {
-        
-        ImageUploadHelper.createUploadFile(imageInfo: info, imageSource: picker.sourceType) { [weak self] (file) in
-            
-            if file != nil{
-                self?.uploadFile(file: file!)
-            }
-        }
+        ImageUploadHelper.createUploadFile(imageInfo: info as [String : Any], imageSource: picker.sourceType,
+                                           response: { [weak self] file in
+                                            if file != nil{
+                                                self?.uploadFile(file: file!)
+                                            }
+            },
+                                           error: { [weak self] error in
+                                            let alert = UIAlertController(title: "Error", message: error.localizedDescription, preferredStyle: UIAlertControllerStyle.alert)
+                                            alert.addAction(UIAlertAction(title: "OK", style: UIAlertActionStyle.cancel, handler: nil))
+                                            self?.present(alert, animated: true, completion: nil)
+        })
         
         picker.dismiss(animated: true, completion: nil)
     }

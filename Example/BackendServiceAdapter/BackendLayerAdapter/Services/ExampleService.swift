@@ -81,8 +81,7 @@ class ExampleService: BackendService {
         let operation = BackendOperation(model: nil, request: BackendReqestRegister.Example.download)
         
         operation.onSuccess = { [weak self] (file, status) in
-            
-            self?.fileController?.unsubscribe(from: operation, removeFromPool: true)
+            self?.fileController?.unsubscribe(fileId: BackendReqestRegister.Example.download.fileId)
             response(file as? FileLoad)
         }
         
@@ -91,14 +90,15 @@ class ExampleService: BackendService {
             let alert = UIAlertController(title: "Error", message: error?.localizedDescription, preferredStyle: UIAlertControllerStyle.alert)
             alert.addAction(UIAlertAction(title: "OK", style: UIAlertActionStyle.cancel, handler: nil))
             UIApplication.topViewController().present(alert, animated: true, completion: nil)
-            self?.fileController?.unsubscribe(from: operation, removeFromPool: true)
+
+            self?.fileController?.unsubscribe(fileId: BackendReqestRegister.Example.download.fileId)
             response(nil)
         }
         
         self.queue?.addOperation(operation: operation)
         
         // Track progress
-        fileController = FileLoadController.init(operation: operation)
+        fileController = FileLoadController.init(fileId: BackendReqestRegister.Example.download.fileId)
         fileController?.subscribeForFileUpload { (file) in
             progress(file)
         }

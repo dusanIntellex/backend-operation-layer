@@ -23,26 +23,24 @@ open class BackendService: NSObject {
 
 extension BackendService{
     
-    public static func parseDataArray<T: Codable>(type:T.Type, data: [String: Any]) -> ([T]?, PaginationModel?){
+    public static func parseDataArray<T: Codable>(type:T.Type, data: [Any]) -> [T]?{
         
         var allDataResponse = [T]()
-        var pagination: PaginationModel?
+//        var pagination: PaginationModel?
         
-        if let mainData = data["data"] as? [Any]{
-            
-            mainData.forEach{
-                do{
-                    let responseModel = try JSONSerialization.data(withJSONObject: $0, options: .prettyPrinted)
-                    let jsonDecoder = JSONDecoder()
-                    let model: T = try jsonDecoder.decode(T.self, from: responseModel)
-                    allDataResponse.append(model)
-                }
-                catch let error{
-                    print(error.localizedDescription)
-                }
+        data.forEach{
+            do{
+                let responseModel = try JSONSerialization.data(withJSONObject: $0, options: .prettyPrinted)
+                let jsonDecoder = JSONDecoder()
+                let model: T = try jsonDecoder.decode(T.self, from: responseModel)
+                allDataResponse.append(model)
+            }
+            catch let error{
+                print(error.localizedDescription)
             }
         }
         
+        /*
         if let metaData = data["pagination"] as? [String: Any]{
             
             do{
@@ -54,24 +52,22 @@ extension BackendService{
                 print(error.localizedDescription)
             }
         }
+         */
         
-        return(allDataResponse, pagination)
+        return allDataResponse //(allDataResponse, pagination)
     }
     
     public static func parseSingleData<T: Codable>(type: T.Type, data:[String: Any]) -> T?{
         
-        if let mainData = data["data"] as? [String: Any]{
-            
-            do{
-                let modelJSON = try JSONSerialization.data(withJSONObject: mainData, options: .prettyPrinted)
-                let jsonDecoder = JSONDecoder()
-                let model: T = try jsonDecoder.decode(T.self, from: modelJSON)
-                return model
-            }
-            catch let error{
-                print(error.localizedDescription)
-            }
+        do{
+            let modelJSON = try JSONSerialization.data(withJSONObject: data, options: .prettyPrinted)
+            let jsonDecoder = JSONDecoder()
+            let model: T = try jsonDecoder.decode(T.self, from: modelJSON)
+            return model
         }
-        return nil
+        catch let error{
+            print(error.localizedDescription)
+            return nil
+        }
     }
 }
