@@ -26,7 +26,7 @@ TODO: Add long description of the pod here.
   # s.screenshots     = 'www.example.com/screenshots_1', 'www.example.com/screenshots_2'
   s.license          = { :type => 'MIT', :file => 'LICENSE' }
   s.author           = { '7946b191437a3fa5083fec69131c92a7b428824d' => 'dusan.cucurevic@quantox.com' }
-  s.source           = { :git => 'https://github.com/7946b191437a3fa5083fec69131c92a7b428824d/BackendServiceAdapter.git', :tag => s.version.to_s }
+  s.source           = { :git => 'https://github.com/dusanIntellex/backend-operation-layer.git', :tag => s.version.to_s }
   # s.social_media_url = 'https://twitter.com/<TWITTER_USERNAME>'
 
   s.ios.deployment_target = '11.0'
