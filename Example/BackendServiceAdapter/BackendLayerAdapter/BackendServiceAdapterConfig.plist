@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>production</key>
+	<dict>
+		<key>SERVER_URL</key>
+		<string>http://test2018.iumeet.com/api/</string>
+		<key>COMMON_HEADERS</key>
+		<dict>
+			<key>Client-Type</key>
+			<string>ios</string>
+			<key>accept</key>
+			<string>application/json</string>
+		</dict>
+	</dict>
+	<key>development</key>
+	<dict>
+		<key>SERVER_URL</key>
+		<string>http://test2018.iumeet.com/api/</string>
+		<key>COMMON_HEADERS</key>
+		<dict>
+			<key>Client-Type</key>
+			<string>ios</string>
+			<key>accept</key>
+			<string>application/json</string>
+		</dict>
+	</dict>
+</dict>
+</plist>

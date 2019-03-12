@@ -26,7 +26,6 @@ extension BackendService{
     public static func parseDataArray<T: Codable>(type:T.Type, data: [Any]) -> [T]?{
         
         var allDataResponse = [T]()
-//        var pagination: PaginationModel?
         
         data.forEach{
             do{
@@ -40,21 +39,7 @@ extension BackendService{
             }
         }
         
-        /*
-        if let metaData = data["pagination"] as? [String: Any]{
-            
-            do{
-                let jsonData = try JSONSerialization.data(withJSONObject: metaData, options: .prettyPrinted)
-                let jsonDecoder = JSONDecoder()
-                pagination = try jsonDecoder.decode(PaginationModel.self, from: jsonData)
-            }
-            catch let error{
-                print(error.localizedDescription)
-            }
-        }
-         */
-        
-        return allDataResponse //(allDataResponse, pagination)
+        return allDataResponse
     }
     
     public static func parseSingleData<T: Codable>(type: T.Type, data:[String: Any]) -> T?{

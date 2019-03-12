@@ -17,6 +17,9 @@
 		1821594321072E58004E3165 /* ServiceRegister.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1821593A21072E57004E3165 /* ServiceRegister.swift */; };
 		1821594421072E58004E3165 /* ExampleService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1821593B21072E57004E3165 /* ExampleService.swift */; };
 		1821594621074DF9004E3165 /* AlertHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1821594521074DF8004E3165 /* AlertHelper.swift */; };
+		189EE2312236946300FE7F21 /* ExampleGetModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 189EE2302236946300FE7F21 /* ExampleGetModel.swift */; };
+		189EE23322369D1C00FE7F21 /* BackendOperationHandleSuccess.swift in Sources */ = {isa = PBXBuildFile; fileRef = 189EE23222369D1C00FE7F21 /* BackendOperationHandleSuccess.swift */; };
+		18FA96D02237C9E60020C917 /* BackendServiceAdapterConfig.plist in Resources */ = {isa = PBXBuildFile; fileRef = 18FA96CF2237C9E60020C917 /* BackendServiceAdapterConfig.plist */; };
 		27770F46B4C495C7A36B87A5 /* Pods_BackendServiceAdapter_Tests.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B6CA777308152F0A1280390F /* Pods_BackendServiceAdapter_Tests.framework */; };
 		607FACD61AFB9204008FA782 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 607FACD51AFB9204008FA782 /* AppDelegate.swift */; };
 		607FACD81AFB9204008FA782 /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 607FACD71AFB9204008FA782 /* ViewController.swift */; };
@@ -49,6 +52,9 @@
 		1821593A21072E57004E3165 /* ServiceRegister.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ServiceRegister.swift; sourceTree = "<group>"; };
 		1821593B21072E57004E3165 /* ExampleService.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ExampleService.swift; sourceTree = "<group>"; };
 		1821594521074DF8004E3165 /* AlertHelper.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AlertHelper.swift; sourceTree = "<group>"; };
+		189EE2302236946300FE7F21 /* ExampleGetModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExampleGetModel.swift; sourceTree = "<group>"; };
+		189EE23222369D1C00FE7F21 /* BackendOperationHandleSuccess.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BackendOperationHandleSuccess.swift; sourceTree = "<group>"; };
+		18FA96CF2237C9E60020C917 /* BackendServiceAdapterConfig.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = BackendServiceAdapterConfig.plist; sourceTree = "<group>"; };
 		4C5DCEEFBC5ADCDE3077BD52 /* Pods-BackendServiceAdapter_Example.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-BackendServiceAdapter_Example.release.xcconfig"; path = "Pods/Target Support Files/Pods-BackendServiceAdapter_Example/Pods-BackendServiceAdapter_Example.release.xcconfig"; sourceTree = "<group>"; };
 		50C9D060B1D8C51D482FDF36 /* Pods-BackendServiceAdapter_Tests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-BackendServiceAdapter_Tests.debug.xcconfig"; path = "Pods/Target Support Files/Pods-BackendServiceAdapter_Tests/Pods-BackendServiceAdapter_Tests.debug.xcconfig"; sourceTree = "<group>"; };
 		607FACD01AFB9204008FA782 /* BackendServiceAdapter_Example.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = BackendServiceAdapter_Example.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -95,6 +101,8 @@
 				1821593021072E57004E3165 /* Models */,
 				1821593221072E57004E3165 /* Requests */,
 				1821593921072E57004E3165 /* Services */,
+				189EE23222369D1C00FE7F21 /* BackendOperationHandleSuccess.swift */,
+				18FA96CF2237C9E60020C917 /* BackendServiceAdapterConfig.plist */,
 			);
 			path = BackendLayerAdapter;
 			sourceTree = "<group>";
@@ -103,6 +111,7 @@
 			isa = PBXGroup;
 			children = (
 				1821593121072E57004E3165 /* ExampleModel.swift */,
+				189EE2302236946300FE7F21 /* ExampleGetModel.swift */,
 			);
 			path = Models;
 			sourceTree = "<group>";
@@ -310,6 +319,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				607FACDB1AFB9204008FA782 /* Main.storyboard in Resources */,
+				18FA96D02237C9E60020C917 /* BackendServiceAdapterConfig.plist in Resources */,
 				607FACE01AFB9204008FA782 /* LaunchScreen.xib in Resources */,
 				607FACDD1AFB9204008FA782 /* Images.xcassets in Resources */,
 			);
@@ -424,6 +434,8 @@
 				1821594221072E58004E3165 /* BRSendigExample.swift in Sources */,
 				1821594321072E58004E3165 /* ServiceRegister.swift in Sources */,
 				1821594121072E58004E3165 /* BRPostSampleRequest.swift in Sources */,
+				189EE23322369D1C00FE7F21 /* BackendOperationHandleSuccess.swift in Sources */,
+				189EE2312236946300FE7F21 /* ExampleGetModel.swift in Sources */,
 				1821593E21072E58004E3165 /* BRDownloadExample.swift in Sources */,
 				1821593D21072E58004E3165 /* BRUploadExample.swift in Sources */,
 				1821593F21072E58004E3165 /* BackendRequestRegister.swift in Sources */,
@@ -521,6 +533,7 @@
 				IPHONEOS_DEPLOYMENT_TARGET = 11.0;
 				MTL_ENABLE_DEBUG_INFO = YES;
 				ONLY_ACTIVE_ARCH = YES;
+				OTHER_LDFLAGS = "-ObjC";
 				SDKROOT = iphoneos;
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 			};
@@ -568,6 +581,7 @@
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				IPHONEOS_DEPLOYMENT_TARGET = 11.0;
 				MTL_ENABLE_DEBUG_INFO = NO;
+				OTHER_LDFLAGS = "-ObjC";
 				SDKROOT = iphoneos;
 				SWIFT_OPTIMIZATION_LEVEL = "-Owholemodule";
 				VALIDATE_PRODUCT = YES;
@@ -584,6 +598,20 @@
 				IPHONEOS_DEPLOYMENT_TARGET = 11.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				MODULE_NAME = ExampleApp;
+				OTHER_LDFLAGS = (
+					"$(inherited)",
+					"-framework",
+					"\"Alamofire\"",
+					"-framework",
+					"\"BackendServiceAdapter\"",
+					"-framework",
+					"\"Kingfisher\"",
+					"-framework",
+					"\"RxAtomic\"",
+					"-framework",
+					"\"RxSwift\"",
+					"-all_load",
+				);
 				PRODUCT_BUNDLE_IDENTIFIER = "org.cocoapods.demo.$(PRODUCT_NAME:rfc1034identifier)";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_SWIFT3_OBJC_INFERENCE = Default;
@@ -601,6 +629,20 @@
 				IPHONEOS_DEPLOYMENT_TARGET = 11.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				MODULE_NAME = ExampleApp;
+				OTHER_LDFLAGS = (
+					"$(inherited)",
+					"-framework",
+					"\"Alamofire\"",
+					"-framework",
+					"\"BackendServiceAdapter\"",
+					"-framework",
+					"\"Kingfisher\"",
+					"-framework",
+					"\"RxAtomic\"",
+					"-framework",
+					"\"RxSwift\"",
+					"-all_load",
+				);
 				PRODUCT_BUNDLE_IDENTIFIER = "org.cocoapods.demo.$(PRODUCT_NAME:rfc1034identifier)";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_SWIFT3_OBJC_INFERENCE = Default;

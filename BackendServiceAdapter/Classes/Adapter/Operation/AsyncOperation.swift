@@ -46,7 +46,6 @@ public class AsyncOperation: Operation {
         return true
     }
     
-    
     // MARK: - NSObject
     @objc private dynamic class func keyPathsForValuesAffectingIsReady() -> Set<String> {
         return ["state"]

@@ -13,11 +13,12 @@ import BackendServiceAdapter
 class BRRestSampleRequest: NSObject , BackendRequest{
     
     func endpoint() -> String {
-        return ""
+        return "test"
     }
     
     func specificUrl() -> String?{
-        return "https://jsonplaceholder.typicode.com/posts/1"
+        return nil
+//        return "https://jsonplaceholder.typicode.com/posts/1"
     }
     
     func method() -> HttpMethod {

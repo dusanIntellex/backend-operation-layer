@@ -14,7 +14,7 @@ import UIKit
  To use different backend executors (Firebase, native iOS URLSession, Alamofire) just change class of executor
 */
 
-enum ResponseError : Error, Equatable{
+public enum ResponseError : Error, Equatable{
     case noInternetConnection
     case requestCancel
     case authorizationError
@@ -184,34 +184,28 @@ public class BackendOperation: AsyncOperation {
     
     //MARK:- Callbacks
     
-    func handleSuccess(data: Any?, statusCode: NSInteger){
-        
-        // TODO: For any special handling of status code, do this here!!
+    private func handleSuccess(data: Any?, statusCode: NSInteger){
         if self.onSuccess != nil{
-            
-            if 200 ... 299 ~= statusCode{
-                self.onSuccess!(data, statusCode)
-            }
-            else if statusCode == 400{
-                self.onFailure?(ResponseError.badLoginCredentials, statusCode)
-            }
-            // Refresh token
-            else if statusCode == 401{
-                self.refreshToken()
-                return
-            }
-            else if statusCode == 403{
-                self.onFailure?(ResponseError.verifyEmail, statusCode)
-            }
-            else if statusCode >= 500{
-                self.onFailure?(ResponseError.serverError, statusCode)
-            }
-            else{
-                self.onFailure?(ResponseError.unknownError, statusCode)
-            }
+            handleData(data: data, statusCode: statusCode)
         }
-        
         self.finish()
+    }
+    
+    // Default data handler
+    @objc dynamic public func handleData(data: Any?, statusCode: NSInteger){
+        
+        if 200 ... 299 ~= statusCode{
+            self.onSuccess!(data, statusCode)
+        }
+        else if 300..<500 ~= statusCode{
+            self.onFailure?(ResponseError.badLoginCredentials, statusCode)
+        }
+        else if statusCode >= 500{
+            self.onFailure?(ResponseError.serverError, statusCode)
+        }
+        else{
+            self.onFailure?(ResponseError.unknownError, statusCode)
+        }
     }
     
     func handleFailure(error: Error?, statusCode: NSInteger){
@@ -220,13 +214,5 @@ public class BackendOperation: AsyncOperation {
             self.onFailure!(error ?? ResponseError.unknownError , statusCode)
         }
         self.finish()
-    }
-
-    
-    // MARK:- Special status code response handlers
-    
-    func refreshToken(){
-        
-        //Refresh token if there is need adn add it to handling status code
     }
 }

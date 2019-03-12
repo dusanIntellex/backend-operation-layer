@@ -10,15 +10,17 @@ import UIKit
 import UserNotifications
 import MobileCoreServices
 import BackendServiceAdapter
+import RxSwift
 
 class ViewController: UIViewController , UIImagePickerControllerDelegate, UINavigationControllerDelegate{
     
     @IBOutlet weak var loadProgressLabel: UILabel!
+    var dispose = DisposeBag()
     
     override func viewDidLoad() {
         super.viewDidLoad()
         // Do any additional setup after loading the view, typically from a nib.
-        
+        BackendOperation.swizzleHandleSuccess()
         registerForNotifications()
     }
 
@@ -31,14 +33,21 @@ class ViewController: UIViewController , UIImagePickerControllerDelegate, UINavi
     
     @IBAction func requestAction(_ sender: UIButton) {
         
-        ServiceRegister.sharedInstance.example.getRestExample { [weak self] (data) in
-            
-            if let dict = data as? [String: Any]{
-                let alert = UIAlertController(title: "Success", message: dict["body"] as? String, preferredStyle: UIAlertControllerStyle.alert)
+        ServiceRegister.sharedInstance.example.getRestExample()
+            .subscribe(onNext: { (value) in
+                print(value)
+            }, onError: { [weak self] (error) in
+                
+                let alert = UIAlertController(title: "Error", message: error.localizedDescription, preferredStyle: UIAlertControllerStyle.alert)
                 alert.addAction(UIAlertAction(title: "OK", style: UIAlertActionStyle.cancel, handler: nil))
                 self?.present(alert, animated: true, completion: nil)
-            }
-        }
+                
+            }, onCompleted: {
+                print("COmpleted")
+            }, onDisposed: {
+                print("Disposed")
+            })
+            .disposed(by: dispose)
     }
     
     @IBAction func postRequestAction(_ sender: UIButton) {

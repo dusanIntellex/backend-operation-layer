@@ -8,11 +8,13 @@
 
 import UIKit
 import BackendServiceAdapter
+import RxSwift
 
 class ExampleService: BackendService {
     
     private var fileController: FileLoadController?
     
+    //MARK:- Normal request
     func getRestExample(response: @escaping (_ dataResponse: Any?) -> Void){
         
         let operation = BackendOperation(model: nil, request: BackendReqestRegister.Example.rest)
@@ -138,5 +140,10 @@ class ExampleService: BackendService {
             }
         }
          */
+    }
+    
+    //MARK:- Rx Requests
+    func getRestExample() -> Observable<ExampleGetModel>{
+        return self.rx.parse(request: BRRestSampleRequest(), type: ExampleGetModel.self)
     }
 }
