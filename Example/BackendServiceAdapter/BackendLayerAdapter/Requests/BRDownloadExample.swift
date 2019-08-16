@@ -17,12 +17,12 @@ class BRDownloadExample: BackendRequest, DownloadFileProtocol, BackgroundModePro
         self.fileId = "downloadFile\(Date().timeIntervalSince1970)"
     }
     
-    func endpoint() -> String {
-        return ""
+    func baseUrl() -> String {
+        return "http://ipv4.download.thinkbroadband.com"
     }
     
-    func specificUrl() -> String?{
-        return "http://ipv4.download.thinkbroadband.com/5MB.zip"
+    func route() -> String {
+        return "5MB.zip"
     }
     
     func method() -> HttpMethod {
@@ -33,7 +33,7 @@ class BRDownloadExample: BackendRequest, DownloadFileProtocol, BackgroundModePro
         return nil
     }
     
-    func requestType() -> RequestType? {
+    func taskType() -> TaskType {
         return .download
     }
     
@@ -41,38 +41,7 @@ class BRDownloadExample: BackendRequest, DownloadFileProtocol, BackgroundModePro
         return nil
     }
     
-    func encodingType() -> ParametersEncodingType? {
+    func parametersEncodingType() -> ParametersEncodingType? {
         return nil
     }
 }
-/*
-class BRDownloadExample: BackendRequest, DownloadFileProtocol, BackgroundModeProtocol {
-    
-    var fileId: String
-
-    init() {
-        self.fileId = "downloadFile\(Date().timeIntervalSince1970)"
-    }
-    
-    
-    func endpoint() -> String {
-        return "http://ipv4.download.thinkbroadband.com/5MB.zip" 
-    }
-    
-    func method() -> HttpMethod {
-        return .get
-    }
-    
-    func paramteres() -> Dictionary<String, Any>? {
-        return nil
-    }
-    
-    func headers() -> Dictionary<String, String>? {
-        return nil
-    }
-    
-    func requestType() -> RequestType? {
-        return .download
-    }
-}
-*/

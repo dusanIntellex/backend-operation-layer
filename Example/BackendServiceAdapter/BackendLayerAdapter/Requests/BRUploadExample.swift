@@ -10,17 +10,17 @@ import UIKit
 import BackendServiceAdapter
 
 class BRUploadExample : BackendRequest, UploadFileProtocol{
-
-    var uploadFile: FileLoad?
     
-    func endpoint() -> String {
-        //        return "https://www.googleapis.com/upload/drive/v3/files?uploadType=media"
-//        return "https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart"
-        return ""
+    var uploadFile: UploadFile?
+    
+    func baseUrl() -> String {
+        return "https://www.googleapis.com"
     }
     
-    func specificUrl() -> String?{
-        return "https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart"
+    func route() -> String {
+        return "upload/drive/v3/files"
+        //        return "https://www.googleapis.com/?uploadType=media"
+//        return "/upload/drive/v3/files?uploadType=multipart"
     }
     
     func method() -> HttpMethod {
@@ -34,7 +34,7 @@ class BRUploadExample : BackendRequest, UploadFileProtocol{
             "Content-Type": "multipart/related; boundary=foo_bar_baz"]
     }
     
-    func requestType() -> RequestType? {
+    func taskType() -> TaskType {
         return .upload
     }
     
@@ -42,7 +42,7 @@ class BRUploadExample : BackendRequest, UploadFileProtocol{
         return nil
     }
     
-    func encodingType() -> ParametersEncodingType? {
+    func parametersEncodingType() -> ParametersEncodingType? {
         return nil
     }
 }

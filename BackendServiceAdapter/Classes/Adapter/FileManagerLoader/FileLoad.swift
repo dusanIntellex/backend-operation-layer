@@ -34,7 +34,13 @@ public class FileLoad: NSObject {
     
     @objc public dynamic var status: FileStatus = .pending
     @objc public dynamic var progress: CGFloat = 0.0
-    public var fileId: String?
+    public var fileId: String?{
+        didSet{
+            if fileId != nil{
+                self.path = FileLoadManager.getTempDirectory().appendingPathComponent(fileId!)
+            }
+        }
+    }
     
     public var path: URL?
     @objc public dynamic var uploadedPath: String?
@@ -48,53 +54,33 @@ public class FileLoad: NSObject {
 //    public var process: UploadRequest?
     
     // MARK:- Constructor
-    
-    init(fileId: String) {
+    public override init() {
         super.init()
-        
-        self.fileId = fileId
-        FilesPool.sharedInstance.pool?.append(self)
+        FilesPool.sharedInstance.addFile(file: self)
     }
     
-    init(fileData: Data, fileId: String){
-        super.init()
+    convenience init(fileId: String) {
+        self.init()
+        self.fileId = fileId
+    }
+    
+    convenience init(fileData: Data, fileId: String){
+        self.init()
         self.data = fileData
         self.fileId = fileId
-        FilesPool.sharedInstance.pool?.append(self)
     }
     
-    init(fileName: String, path: URL, fileExtension: String, fileId: String) {
-        super.init()
+    convenience init(path: URL, fileId: String){
+        self.init()
+        self.path = path
+        self.fileId = fileId
+    }
+    
+    convenience init(fileName: String, path: URL, fileExtension: String, fileId: String) {
+        self.init()
         self.name = fileName
         self.path = path
         self.fileExtension = fileExtension
         self.fileId = fileId
-    }
-    
-    /// Return file with id from pool array. If not exsist create new file
-    ///
-    /// - Parameter fileId: unique file id
-    /// - Returns: FileUpload object
-    public static func getFile(fileId: String, data: NSData?) -> FileLoad{
-        
-        if let file = FilesPool.sharedInstance.pool?.first(where: {$0.fileId == fileId }){
-            
-            if data != nil{
-                FileLoadManager.writeFile(file.path!, data: data!)
-            }
-            
-            return file
-        }
-        else{
-            
-            let file = FileLoad(fileId: fileId)
-            file.path = FileLoadManager.createFolder()?.appendingPathComponent(fileId)
-            
-            if data != nil{
-                FileLoadManager.writeFile(file.path!, data: data!)
-            }
-            
-            return file
-        }
     }
 }

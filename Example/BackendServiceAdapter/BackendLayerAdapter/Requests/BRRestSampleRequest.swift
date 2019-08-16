@@ -12,13 +12,8 @@ import BackendServiceAdapter
 
 class BRRestSampleRequest: NSObject , BackendRequest{
     
-    func endpoint() -> String {
+    func route() -> String {
         return "test"
-    }
-    
-    func specificUrl() -> String?{
-        return nil
-//        return "https://jsonplaceholder.typicode.com/posts/1"
     }
     
     func method() -> HttpMethod {
@@ -29,7 +24,7 @@ class BRRestSampleRequest: NSObject , BackendRequest{
         return nil
     }
     
-    func requestType() -> RequestType? {
+    func taskType() -> TaskType {
         return .rest
     }
     
@@ -37,7 +32,7 @@ class BRRestSampleRequest: NSObject , BackendRequest{
         return nil
     }
     
-    func encodingType() -> ParametersEncodingType? {
+    func parametersEncodingType() -> ParametersEncodingType? {
         return nil
     }
 }

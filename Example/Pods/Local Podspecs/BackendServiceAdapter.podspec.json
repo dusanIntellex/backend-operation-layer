@@ -1,7 +1,8 @@
 {
   "name": "BackendServiceAdapter",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "summary": "A short description of BackendServiceAdapter.",
+  "swift_version": "4.0",
   "description": "TODO: Add long description of the pod here.",
   "homepage": "https://github.com/7946b191437a3fa5083fec69131c92a7b428824d/BackendServiceAdapter",
   "license": {
@@ -12,8 +13,8 @@
     "7946b191437a3fa5083fec69131c92a7b428824d": "dusan.cucurevic@quantox.com"
   },
   "source": {
-    "git": "https://github.com/7946b191437a3fa5083fec69131c92a7b428824d/BackendServiceAdapter.git",
-    "tag": "0.1.0"
+    "git": "https://github.com/dusanIntellex/backend-operation-layer.git",
+    "tag": "0.2.0"
   },
   "platforms": {
     "ios": "11.0"

@@ -10,52 +10,23 @@ import UIKit
 
 public class FileLoadManager: NSObject {
 
-    
     /// Check if file exists on path
     ///
     /// - Parameter url: path for file
     /// - Returns: Bool value
     static func checkURL(url: URL) -> Bool{
-        
         if FileManager().fileExists(atPath: url.path) {
-            print("The file already exists at path")
+            print("The \(url.absoluteString) already exists")
             return true
         } else {
             return false
         }
     }
     
-    
-    /// Get data for index
-    ///
-    /// - Parameter index: Index of object in download array of datas
-    /// - Returns: Encrypted data for index
-    static func getFile(fileId: String?) -> NSData?{
-        
-        if fileId != nil{
-            
-            let path = createFolder()?.appendingPathComponent(fileId!)
-            
-            if checkURL(url:path!){
-                
-                return NSData(contentsOf: path!)
-            }
-            else{
-                
-                print("Error: No file on this url path")
-                return nil
-            }
-        }
-        return nil
-    }
-    
     /// Remove question from temp file
-    public static func removeAllFilesFromTempFolder(){
-        
+    static func removeAllFilesFromTempFolder(){
         let docTempDirectory = FileLoadManager.getTempDirectory()
-        
         if FileLoadManager.checkURL(url: docTempDirectory){
-            
             do{
                 let files = try FileManager.default.contentsOfDirectory(atPath: docTempDirectory.path)
                 for filePath in files {
@@ -70,52 +41,55 @@ public class FileLoadManager: NSObject {
         }
     }
     
-    static func writeFile(_ path : URL, data: NSData){
-        
-        //writing
-        do {
-            try data.write(to: path, options: .atomic)
+    static func getAllFilesFromTempFolder() -> [FileLoad] {
+        let docTempDirectory = FileLoadManager.getTempDirectory()
+        do{
+            let paths = try FileManager.default.contentsOfDirectory(atPath: docTempDirectory.path)
+            return paths.compactMap{ path in
+                guard let url = URL(string: path), let data = try? Data(contentsOf: url), !data.isEmpty else{
+                    return nil
+                }
+                return FileLoad(path: url, fileId: url.lastPathComponent)
+            }
         }
-        catch {
-        
-            print("Error for writing file")
+        catch{
+            print("Failed to get files from \(docTempDirectory.absoluteString)", error.localizedDescription)
+            return []
         }
     }
     
+    static func deleteFile(_ fileId: String) throws{
+        let path = getTempDirectory().appendingPathComponent(fileId)
+        try FileManager.default.removeItem(at: path)
+    }
     
-    /// Create folder or if exsist return path
+    static func writeFile(_ fileId : String, data: Data) throws{
+        let path = getTempDirectory().appendingPathComponent(fileId)
+        try data.write(to: path, options: .atomic)
+    }
+    
+    
+    /// Get temp directory
     ///
-    /// - Returns: Path of folder
-    class func createFolder() -> URL?{
-        
-        let docTempDirectory = getTempDirectory()
+    /// - Returns: Temp directory URL
+    static func getTempDirectory() -> URL{  
+        let paths = NSSearchPathForDirectoriesInDomains(FileManager.SearchPathDirectory.documentDirectory, FileManager.SearchPathDomainMask.userDomainMask, true)
+        let documentsDirectory: URL = NSURL(fileURLWithPath: paths.first!, isDirectory: true) as URL
+        let docTempDirectory = documentsDirectory.appendingPathComponent("temp")
         
         // If folder don't exsist , create it
         if !checkURL(url: docTempDirectory){
-            
             do {
                 try FileManager.default.createDirectory(atPath: docTempDirectory.path, withIntermediateDirectories: false, attributes: nil)
                 return docTempDirectory
-            } catch let error as NSError {
-                print(error.localizedDescription);
-                return nil
+            } catch {
+                fatalError(error.localizedDescription)
             }
         }
             // Return exsisting URL
         else{
             return docTempDirectory
         }
-    }
-    
-    /// Get temp directory
-    ///
-    /// - Returns: Temp directory URL
-    class func getTempDirectory() -> URL{
-        
-        let paths = NSSearchPathForDirectoriesInDomains(FileManager.SearchPathDirectory.documentDirectory, FileManager.SearchPathDomainMask.userDomainMask, true)
-        let documentsDirectory: URL = NSURL(fileURLWithPath: paths.first!, isDirectory: true) as URL
-        
-        return documentsDirectory.appendingPathComponent("IntellexFileUpload")
     }
     
 }

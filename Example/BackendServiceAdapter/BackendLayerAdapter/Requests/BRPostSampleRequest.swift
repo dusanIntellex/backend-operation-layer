@@ -10,81 +10,37 @@ import UIKit
 import BackendServiceAdapter
 
 
-class BRPostSampleRequest : NSObject, BackendRequest, SendingProtocols{
-
-    func getEncodedData() -> [String : Any]? {
-        return self.encode()
-    }
-    func setSendingData(data: Encodable) {
-        if let data = data as? ExampleModelObject{
-            self.sendingModel = data
-        }
-    }
-    typealias GenericEncodableType = ExampleModelObject
-    var sendingModel: ExampleModelObject?
-    
-    func endpoint() -> String {
-        return ""
+class BRPostSampleRequest : NSObject, BackendRequest{
+    func baseUrl() -> String {
+        return "https://jsonplaceholder.typicode.com"
     }
     
-    func specificUrl() -> String?{
-        return "https://jsonplaceholder.typicode.com/posts"
+    func route() -> String{
+        return "posts"
     }
     
-    func method() -> HttpMethod {
+    func method() -> HttpMethod{
         return .get
     }
-    
-    func headers() -> Dictionary<String, String>? {
+    func headers() -> Dictionary<String, String>?{
         return nil
     }
     
-    func requestType() -> RequestType? {
+    func params() -> [String: Any]?{
+        return nil
+    }
+    
+    /// Type which define how will parameters be encoded
+    ///
+    /// - Returns: Enum values of enciding type
+    func parametersEncodingType() -> ParametersEncodingType?{
+        return nil
+    }
+    
+    /// Return what type of request is
+    ///
+    /// - Returns: Enums: rest,upload,uploadMultipart,download
+    func taskType() -> TaskType{
         return .rest
     }
-    
-    func params() -> [String : Any]? {
-        return nil
-    }
-    
-    func encodingType() -> ParametersEncodingType? {
-        return .jsonBody
-    }
 }
-/*
-class BRPostSampleRequest: NSObject, BackendRequest, SendingProtocols {
-    
-    func getEncodedData() -> [String : Any]? {
-        return self.encode()
-    }
-    
-    func setSendingData(data: Encodable) {
-        if let data = data as? ExampleModelObject{
-            self.sendingModel = data
-        }
-    }
-    
-    typealias GenericEncodableType = ExampleModelObject
-    var sendingModel: ExampleModelObject?
-    
-    func endpoint() -> String {
-        return "https://jsonplaceholder.typicode.com/posts"
-    }
-    
-    func method() -> HttpMethod {
-        return .post
-    }
-    
-    func headers() -> Dictionary<String, String>? {
-        return nil
-    }
-    
-    func requestType() -> RequestType? {
-        return .rest
-    }
-    
-    func encodingType() -> ParametersEncodingType? {
-        return .jsonBody
-    }
-}
-*/

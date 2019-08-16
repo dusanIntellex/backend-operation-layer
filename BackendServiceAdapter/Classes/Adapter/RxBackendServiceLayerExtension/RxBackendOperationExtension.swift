@@ -26,11 +26,11 @@ extension ResponseParseError : LocalizedError{
 
 extension Reactive where Base : BackendService{
     
-    public func response(request: BackendRequest, model: Encodable? = nil) -> Observable<Any>{
+    public func response(request: BackendRequest) -> Observable<Any>{
         
         return Observable.create{ observer in
             
-            let operation = BackendOperation(model: model, request: request)
+            let operation = BackendOperation(request)
             
             operation.onSuccess = { data, status in
                 observer.onNext(data!)
@@ -47,8 +47,8 @@ extension Reactive where Base : BackendService{
         }
     }
     
-    public func parse<T: Codable>(request :BackendRequest, type: T.Type, model: Encodable? = nil) -> Observable<T>{
-        return response(request: request, model: model).map { value -> T in
+    public func parse<T: Codable>(request :BackendRequest, type: T.Type) -> Observable<T>{
+        return response(request: request).map { value -> T in
             if let dict = value as? [String : Any]{
                 if let decodableData = BackendService.parseSingleData(type: type, data: dict){
                     return decodableData
@@ -64,7 +64,7 @@ extension Reactive where Base : BackendService{
     }
     
     public func parseArray<T: Codable>(request :BackendRequest, type: T , model: Encodable? = nil) -> Observable<[T]>{
-        return response(request: request, model: model).map { value -> [T] in
+        return response(request: request).map { value -> [T] in
             if let dict = value as? [Any]{
                 if let decodableData = BackendService.parseDataArray(type: T.self, data: dict){
                     return decodableData

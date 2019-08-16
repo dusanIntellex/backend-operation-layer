@@ -9,18 +9,12 @@
 import Foundation
 import BackendServiceAdapter
 
-class BRSendigExample : BackendRequest, PostDataProtocol, UploadFileProtocol{
+class BRSendigExample : BackendRequest, UploadFileProtocol{
     
-    var uploadFile: FileLoad?
-    var sendingModel: ExampleModel?
-    typealias GenericEncodableType = ExampleModel
+    var uploadFile: UploadFile?
     
-    func endpoint() -> String {
+    func route() -> String {
         return "endpoint"
-    }
-    
-    func specificUrl() -> String?{
-        return nil
     }
     
     func method() -> HttpMethod {
@@ -31,7 +25,7 @@ class BRSendigExample : BackendRequest, PostDataProtocol, UploadFileProtocol{
         return nil
     }
     
-    func requestType() -> RequestType? {
+    func taskType() -> TaskType {
         return .rest
     }
     
@@ -39,7 +33,7 @@ class BRSendigExample : BackendRequest, PostDataProtocol, UploadFileProtocol{
         return nil
     }
     
-    func encodingType() -> ParametersEncodingType? {
+    func parametersEncodingType() -> ParametersEncodingType? {
         return .jsonBody
     }
 }

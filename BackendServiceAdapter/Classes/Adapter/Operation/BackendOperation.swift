@@ -64,45 +64,24 @@ extension ResponseError : LocalizedError{
 
 public class BackendOperation: AsyncOperation {
     
-    lazy var executor: BackendExecutorProtocol = {
-        return BackendAlamofireExecutor()
+    lazy var executor: ExecutorProtocol = {
+        return AlamofireExecutor()
 //        return BackendRequestExecutor()
     }()
     
-    var request: BackendRequest?
+    var request: BackendRequest!
     
     public var onSuccess: BackendRequestSuccessCallback?
     public var onFailure: BackendRequestFailureCallback?
     
     // MARK:- Initilizer
     
-    public init(model: Encodable?, request: BackendRequest?) {
+    public init(_ request: BackendRequest) {
         super.init()
-
         self.request = request
-
-        if let req = request as? ManagePostDataProtocol, model != nil{
-            req.setSendingData(data: model!)
-        }
     }
 
-
-    public init(model: Encodable?, request: BackendRequest?,_ uploadFile: FileLoad?) {
-        super.init()
-
-        self.request = request
-        
-        if let req = request as? ManagePostDataProtocol, model != nil{
-            req.setSendingData(data: model!)
-        }
-        
-        if let _ = request as? UploadFileProtocol, uploadFile != nil{
-            (self.request as! UploadFileProtocol).uploadFile = uploadFile!
-        }
-    }
-    
     //MARK:- Start
-    
     override public func execute() {
         
         // Check connection
@@ -117,9 +96,7 @@ public class BackendOperation: AsyncOperation {
             return
         }
         
-        guard let type = request!.requestType()  else { rest(); return }
-        
-        switch type {
+        switch request.taskType() {
         case .rest:
             rest()
             break

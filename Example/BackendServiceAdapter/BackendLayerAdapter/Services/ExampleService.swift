@@ -17,7 +17,7 @@ class ExampleService: BackendService {
     //MARK:- Normal request
     func getRestExample(response: @escaping (_ dataResponse: Any?) -> Void){
         
-        let operation = BackendOperation(model: nil, request: BackendReqestRegister.Example.rest)
+        let operation = BackendOperation(BackendReqestRegister.Example.rest)
         
         operation.onSuccess = {(data, status) in
             
@@ -38,7 +38,7 @@ class ExampleService: BackendService {
     
     func postRestExample(exampleModel: ExampleModel, response: @escaping (_ response: Any?) -> Void){
         
-        let operation = BackendOperation(model: exampleModel, request: BackendReqestRegister.Example.post)
+        let operation = BackendOperation(BackendReqestRegister.Example.post)
         
         operation.onSuccess = {(data, status) in
             
@@ -59,7 +59,7 @@ class ExampleService: BackendService {
     
     func postRestExample(exampleModelObject: ExampleModelObject, response: @escaping (_ response: Any?) -> Void){
         
-        let operation = BackendOperation(model: exampleModelObject, request: BackendReqestRegister.Example.post)
+        let operation = BackendOperation(BackendReqestRegister.Example.post)
         
         operation.onSuccess = {(data, status) in
             
@@ -80,7 +80,7 @@ class ExampleService: BackendService {
     
     func downloadFile(response: @escaping (_ responseFile: FileLoad?) -> Void, progress: @escaping (_ file : FileLoad) -> Void){
 
-        let operation = BackendOperation(model: nil, request: BackendReqestRegister.Example.download)
+        let operation = BackendOperation(BackendReqestRegister.Example.download)
         
         operation.onSuccess = { [weak self] (file, status) in
             self?.fileController?.unsubscribe(fileId: BackendReqestRegister.Example.download.fileId)

@@ -8,7 +8,7 @@
 
 import UIKit
 
-class BackendRequestExecutor: NSObject, URLSessionTaskDelegate,URLSessionDelegate, URLSessionDownloadDelegate, BackendExecutorProtocol {
+class URLSessionExecutor: NSObject, URLSessionTaskDelegate,URLSessionDelegate, URLSessionDownloadDelegate, ExecutorProtocol {
     
     enum Constant: String {
         case sessionID = "quantox.com.BackendLayerDemo.bgSession"
@@ -30,12 +30,11 @@ class BackendRequestExecutor: NSObject, URLSessionTaskDelegate,URLSessionDelegat
         }()
     
     var dataTask: URLSessionTask?
-    var loadFile: FileLoad?
+    weak var loadFile: FileLoad?
     var successCallback: BackendRequestSuccessCallback?
     var failureCallback: BackendRequestFailureCallback?
     
     func getSession(request: BackendRequest) -> URLSession{
-        
         return (request as? BackgroundModeProtocol) != nil ? backgroundSession : regularSession
     }
     
@@ -46,17 +45,37 @@ class BackendRequestExecutor: NSObject, URLSessionTaskDelegate,URLSessionDelegat
         let request = self.requestWithBackendRequest(backendRequest: backendRequest)
         let session = getSession(request: backendRequest)
         
+        if _isDebugAssertConfiguration(){
+            print("""
+                /nBackend service request:
+                Base url:\n\(backendRequest.baseUrl())
+                Route:\n\(backendRequest.route())
+                Method:\n\(backendRequest.method())
+                Headers:\n\(backendRequest.headers() as AnyObject)
+                Sending params:\n\(backendRequest.params() as AnyObject)
+                Parameters encoding type:\n\(backendRequest.parametersEncodingType().debugDescription)
+                """)
+        }
+        
         dataTask = session.dataTask(with: request, completionHandler: { (data, response, error) in
+            
+            if _isDebugAssertConfiguration(){
+                print("""
+                    Response for request:
+                    \(response?.url?.absoluteString ?? "unknown")
+                    Result:
+                    \(response.debugDescription)
+                    """)
+            }
             
             if response == nil{
                 failureCallback(ResponseError.serverError, 0)
                 return;
             }
-            
+
             let statusCode = (response as! HTTPURLResponse).statusCode
             
             if data != nil{
-                
                 do{
                     let json = try JSONSerialization.jsonObject(with: data!, options: .allowFragments)
                     successCallback(json, statusCode)
@@ -83,17 +102,13 @@ class BackendRequestExecutor: NSObject, URLSessionTaskDelegate,URLSessionDelegat
     ///   - failureCallback: <#failureCallback description#>
     func downloadFile(backendRequest: BackendRequest, successCallback: @escaping BackendRequestSuccessCallback, failureCallback: @escaping BackendRequestFailureCallback) {
         
-        guard let fileId = (backendRequest as? DownloadFileProtocol)?.fileId else {
-            if _isDebugAssertConfiguration(){
-                print("You have not set file id within request. Backend request: \(backendRequest.endpoint()) need to implement Download File protocol")
-            }
-            failureCallback(BackendRequestError.missingDownloadFileId, 1001)
-            return
+        // File located on disk
+        guard backendRequest.taskType() == .download, let fileId = (backendRequest as? DownloadFileProtocol)?.fileId else {
+            fatalError("You have not set file id within request. Backend request: \(backendRequest.route()) need to implement Download File protocol")
         }
         
         let session = getSession(request: backendRequest)
-        
-        self.loadFile = FileLoad.getFile(fileId: fileId, data: nil)
+        self.loadFile = FilesPool.sharedInstance.getFile(fileId: fileId)
         self.successCallback = successCallback
         self.failureCallback = failureCallback
         
@@ -113,12 +128,8 @@ class BackendRequestExecutor: NSObject, URLSessionTaskDelegate,URLSessionDelegat
     ///   - failureCallback: Return error and stts code
     func uploadFile(backendRequest: BackendRequest, successCallback: @escaping BackendRequestSuccessCallback, failureCallback: @escaping BackendRequestFailureCallback) {
         
-        guard let file = (backendRequest as? UploadFileProtocol)?.uploadFile else {
-            if _isDebugAssertConfiguration(){
-                print("You have not set file id within request. Backend request: \(backendRequest.endpoint()) need to implement Download File protocol")
-            }
-            failureCallback(BackendRequestError.missingUploadFileId, 1001)
-            return
+        guard backendRequest.taskType() == .upload, let file = (backendRequest as? UploadFileProtocol)?.uploadFile else {
+            fatalError("You have not set file id within request. Backend request: \(backendRequest.route()) need to implement Download File protocol")
         }
         
         let session = getSession(request: backendRequest)
@@ -128,38 +139,32 @@ class BackendRequestExecutor: NSObject, URLSessionTaskDelegate,URLSessionDelegat
         self.successCallback = successCallback
         self.failureCallback = failureCallback
         
-        if let tempURL = copyFileTemporaryDirectory(file: file.data!, fileExtension: file.fileExtension!){
-            self.dataTask = session.uploadTask(with: request, fromFile: tempURL) // session.uploadTask(with: request, from: file.data!)
-            self.dataTask?.resume()
+        guard let tempURL = file.path else{
+            if _isDebugAssertConfiguration(){
+                print("Can not create temp url path!. Upload file: \(file.fileId ?? "")")
+            }
+            failureCallback(BackendRequestError.errorCreatingTempFile, 1001)
+            return
         }
+        
+        self.dataTask = session.uploadTask(with: request, fromFile: tempURL) // session.uploadTask(with: request, from: file.data!)
+        self.dataTask?.resume()
     }
     
     func uploadMultipart(backendRequest: BackendRequest, successCallback: @escaping BackendRequestSuccessCallback, failureCallback: @escaping BackendRequestFailureCallback){
         
-        guard let file = (backendRequest as? UploadFileProtocol)?.uploadFile else {
-            if _isDebugAssertConfiguration(){
-                print("You have not set file id within request. Backend request: \(backendRequest.endpoint()) need to implement Download File protocol")
-            }
-            failureCallback(BackendRequestError.missingUploadFileId, 1001)
-            return
+        guard backendRequest.taskType() == .upload, let file = (backendRequest as? UploadFileProtocol)?.uploadFile else {
+            fatalError("You have not set file id within request. Backend request: \(backendRequest.route()) need to implement Download File protocol")
         }
         
-        let urlString = SERVER_URL.appending(backendRequest.endpoint())
-        let url = URL(string: urlString)
-        
-        let request = NSMutableURLRequest(url: url!, cachePolicy: .reloadIgnoringLocalAndRemoteCacheData, timeoutInterval: timeoutInterval)
-        request.httpMethod = backendRequest.method().rawValue
+        var request = requestWithBackendRequest(backendRequest: backendRequest)
         
         let boundary = "Boundary-\(UUID().uuidString)"
         request.setValue("multipart/form-data; boundary=\(boundary)", forHTTPHeaderField: "Content-Type")
         
-        var params : [String : Any]?
+        let params = getParams(backendRequest: backendRequest)
         
-        if let request = backendRequest as? ManagePostDataProtocol {
-            params = request.getEncodedData()
-        }
-        
-        request.httpBody = createBody(parameters: params as? [String : String], boundary: boundary, data: file.data!, mimeType: file.mimeType ?? "", filename: file.name ?? "untitled")
+        request.httpBody = createBody(parameters: params, boundary: boundary, data: file.data!, mimeType: file.mimeType ?? "image/jpg", name: file.name ?? "image", filename: file.name ?? "untitled")
         
         let session = getSession(request: backendRequest)
         
@@ -167,16 +172,95 @@ class BackendRequestExecutor: NSObject, URLSessionTaskDelegate,URLSessionDelegat
         self.successCallback = successCallback
         self.failureCallback = failureCallback
         
-        if let tempURL = copyFileTemporaryDirectory(file: file.data!, fileExtension: file.fileExtension!){
-            self.dataTask = session.uploadTask(with: request as URLRequest, fromFile: tempURL) // session.uploadTask(with: request, from: file.data!)
-            self.dataTask?.resume()
+        guard let tempURL = file.path else{
+            if _isDebugAssertConfiguration(){
+                print("Can not create temp url path!. Upload file: \(file.fileId ?? "")")
+            }
+            failureCallback(BackendRequestError.errorCreatingTempFile, 1001)
+            return
+        }
+        
+        self.dataTask = session.uploadTask(with: request as URLRequest, fromFile: tempURL) // session.uploadTask(with: request, from: file.data!)
+        self.dataTask?.resume()
+    }
+    
+    //MARK:- Private
+    
+    private func requestWithBackendRequest(backendRequest: BackendRequest) -> URLRequest{
+        let url = getUrl(backendRequest: backendRequest)
+        let request = NSMutableURLRequest(url: url, cachePolicy: .reloadIgnoringLocalAndRemoteCacheData, timeoutInterval: timeoutInterval)
+        request.httpMethod = backendRequest.method().rawValue
+        // Set header for specific server
+        setHeaders(backendRequest: backendRequest, for: request)
+        
+        // Get params
+        let params = getParams(backendRequest: backendRequest)
+        if let encodingType = backendRequest.parametersEncodingType(){
+            setParams(type: encodingType, params: params, request: request)
+        }
+        
+        return request as URLRequest
+    }
+    
+    private func getUrl(backendRequest: BackendRequest) -> URL{
+        let baseUrl = backendRequest.baseUrl()
+        let urlString = baseUrl.appending(backendRequest.route())
+        guard let endpoint = URL(string: urlString) else{
+            fatalError("Endpoint could not be created from base url \"\(baseUrl)\" and route \"\(backendRequest.route())\"")
+        }
+        return endpoint
+    }
+    
+    private func setHeaders(backendRequest: BackendRequest, for request:NSMutableURLRequest){
+        // Set header for specific server
+        for value in COMMON_HEADERS{
+            request.setValue(value.value, forHTTPHeaderField: value.key)
+        }
+        // Custom headers
+        if let headers = backendRequest.headers(){
+            for pair in headers {
+                request.setValue(pair.value, forHTTPHeaderField: pair.key)
+            }
         }
     }
     
-    private func createBody(parameters: [String: String]?,
+    private func getParams(backendRequest: BackendRequest) -> [String : Any]{
+        return backendRequest.params() ?? [String : Any]()
+    }
+    
+    private func setParams(type: ParametersEncodingType, params: [String: Any], request: NSMutableURLRequest){
+        switch type{
+        case .jsonBody:
+            do{
+                let jsonParams = try JSONSerialization.data(withJSONObject: params, options: .prettyPrinted)
+                request.httpBody = jsonParams
+            }
+            catch{
+                print(error.localizedDescription)
+            }
+            break
+        case .multipartBodyURLEncode:
+            if let data = encodeUrlParams(requestParams: params).data(using: .utf8){
+                request.httpBody = data
+            }
+            else{
+                print("Not able to create base64 data from params")
+            }
+            break
+            
+        case .urlEncode:
+            let urlComponents = NSURLComponents(string: request.url!.absoluteString)
+            urlComponents?.queryItems = params.map{ URLQueryItem(name: $0.key, value: String(describing: $0.value)) }
+            request.url = urlComponents?.url
+            break
+        }
+    }
+    
+    private func createBody(parameters: [String: Any]?,
                     boundary: String,
                     data: Data,
                     mimeType: String,
+                    name: String,
                     filename: String) -> Data {
         
         let body = NSMutableData()
@@ -187,12 +271,12 @@ class BackendRequestExecutor: NSObject, URLSessionTaskDelegate,URLSessionDelegat
             for (key, value) in param {
                 body.appendString(boundaryPrefix)
                 body.appendString("Content-Disposition: form-data; name=\"\(key)\"\r\n\r\n")
-                body.appendString("\(value)\r\n")
+                body.appendString("\("\(value)"))\r\n")
             }
         }
         
         body.appendString(boundaryPrefix)
-        body.appendString("Content-Disposition: form-data; name=\"file\"; filename=\"\(filename)\"\r\n")
+        body.appendString("Content-Disposition: form-data; name=\"\(name)\"; filename=\"\(filename)\"\r\n")
         body.appendString("Content-Type: \(mimeType)\r\n\r\n")
         body.append(data)
         body.appendString("\r\n")
@@ -201,115 +285,7 @@ class BackendRequestExecutor: NSObject, URLSessionTaskDelegate,URLSessionDelegat
         return body as Data
     }
     
-    private func requestWithBackendRequest(backendRequest: BackendRequest) -> URLRequest{
-        
-        var url: URL!
-        if let specUrl = backendRequest.specificUrl(){
-            url = URL(string: specUrl)!
-        }
-        else{
-            let urlString = SERVER_URL.appending(backendRequest.endpoint())
-            url = URL(string: urlString)!
-        }
-        
-        let request = NSMutableURLRequest(url: url, cachePolicy: .reloadIgnoringLocalAndRemoteCacheData, timeoutInterval: timeoutInterval)
-        request.httpMethod = backendRequest.method().rawValue
-        
-        // Set header for specific server
-        _ = COMMON_HEADERS.map{
-            request.setValue($0.value, forHTTPHeaderField: $0.key)
-        }
-        
-        if let headers = backendRequest.headers(){
-            
-            for dict in headers {
-                
-                request.setValue(dict.value, forHTTPHeaderField: dict.key)
-            }
-        }
-        
-        var params : [String : Any]?
-        
-        if let requestParams = backendRequest.params(){
-            
-            params = requestParams
-        }
-        else if let request = backendRequest as? ManagePostDataProtocol {
-            
-            if let encodedParams = request.getEncodedData(){
-                params = encodedParams
-            }
-            else if _isDebugAssertConfiguration(){
-                print("Not able to encode data")
-            }
-        }
-        
-        
-        
-        // Set params
-        if let encodingType = backendRequest.encodingType(), params != nil {
-            
-            switch encodingType{
-                
-            case .jsonBody:
-                do{
-                    let jsonParams = try JSONSerialization.data(withJSONObject: params!, options: .prettyPrinted)
-                    request.httpBody = jsonParams
-                }
-                catch{
-                    print(error.localizedDescription)
-                }
-                break
-                
-            case .multipartBodyURLEncode:
-                
-                if let data = encodeUrlParams(requestParams: params!).data(using: .utf8){
-                    request.httpBody = data
-                }
-                else{
-                    print("Not able to create base64 data from params")
-                }
-                
-                break
-                
-            case .urlEncode:
-                let urlString = (request.url?.absoluteString)! + encodeUrlParams(requestParams: params!)
-                request.url = URL(string: urlString)
-                break
-            }
-        }
-        
-        if _isDebugAssertConfiguration(){
-            print("""
-                \nBackend service request:
-                \nEndpoint:\(backendRequest.endpoint())
-                \nURL:\(request.url?.absoluteString ?? "")
-                \nMethod:\(request.httpMethod)
-                \nEncoding:\(String(describing: backendRequest.encodingType().debugDescription))
-                \nHeaders:\(String(describing: request.allHTTPHeaderFields)))
-                \nParams:\(String(describing: params))
-                """)
-        }
-        
-        return request as URLRequest
-    }
-    
-    
-    // MARK: - Task manage
-    
-    func cancel(){
-        self.dataTask?.cancel()
-    }
-    
-    func resume(){
-        self.dataTask?.resume()
-    }
-    
-    func pause(){
-        self.dataTask?.suspend()
-    }
-    
-    func encodeUrlParams(requestParams: [String: Any]) -> String{
+    private func encodeUrlParams(requestParams: [String: Any]) -> String{
         
         var urlParamsEncode = "?"
         
@@ -328,28 +304,33 @@ class BackendRequestExecutor: NSObject, URLSessionTaskDelegate,URLSessionDelegat
         return urlParamsEncode
     }
     
+    // MARK: - Task manage
+    
+    func cancel(){
+        self.dataTask?.cancel()
+    }
+    
+    func resume(){
+        self.dataTask?.resume()
+    }
+    
+    func pause(){
+        self.dataTask?.suspend()
+    }
+    
     //MARK:- Session delegate for tracking upload and download progress
     
     func urlSession(_ session: URLSession, task: URLSessionTask, didSendBodyData bytesSent: Int64, totalBytesSent: Int64, totalBytesExpectedToSend: Int64) {
-        
         let uploadProgress:Float = Float(totalBytesSent) / Float(totalBytesExpectedToSend)
-        if let file = self.loadFile {
-            
-            file.progress = CGFloat(uploadProgress)
-            self.loadFile?.status = .progress
-        }
+        self.loadFile?.progress = CGFloat(uploadProgress)
+        self.loadFile?.status = .progress
     }
     
     func urlSession(_ session: URLSession, downloadTask: URLSessionDownloadTask, didWriteData bytesWritten: Int64, totalBytesWritten: Int64, totalBytesExpectedToWrite: Int64) {
-        
         let downloadProgress:Float = Float(totalBytesWritten) / Float(totalBytesExpectedToWrite)
-        if let file = self.loadFile {
-            
-            file.progress = CGFloat(downloadProgress)
-            self.loadFile?.status = .progress
-        }
+        self.loadFile?.progress = CGFloat(downloadProgress)
+        self.loadFile?.status = .progress
     }
-    
     
     func urlSession(_ session: URLSession, task: URLSessionTask, didCompleteWithError error: Error?) {
         
@@ -357,7 +338,6 @@ class BackendRequestExecutor: NSObject, URLSessionTaskDelegate,URLSessionDelegat
         
         if error != nil{
             self.loadFile?.status = .fail
-            
             self.failureCallback?(error!, statusCode)
             return
         }
@@ -371,8 +351,7 @@ class BackendRequestExecutor: NSObject, URLSessionTaskDelegate,URLSessionDelegat
     }
     
     func urlSession(_ session: URLSession, downloadTask: URLSessionDownloadTask, didFinishDownloadingTo location: URL) {
-        
-        
+
         let statusCode = (downloadTask.response as? HTTPURLResponse)?.statusCode
         
         guard downloadTask.error == nil else{
@@ -382,40 +361,26 @@ class BackendRequestExecutor: NSObject, URLSessionTaskDelegate,URLSessionDelegat
         }
         
         if downloadTask.response == nil{
+            self.loadFile?.status = .fail
             self.failureCallback?(BackendRequestError.errorDownloadingFile, 1001)
             return;
         }
         
-        if let file = self.loadFile {
-            
-            if file.path != nil{
-                do {
-                    if FileManager.default.fileExists(atPath: file.path!.path){
-                        do{
-                            try FileManager.default.removeItem(at: file.path!)
-                        }
-                        catch{
-                            self.failureCallback?(error, statusCode!)
-                            return
-                        }
-                    }
-                    
-                    try FileManager.default.copyItem(at: location, to: file.path!)
-                    self.successCallback?(file, statusCode!)
-                } catch (let writeError) {
-                    print("error writing file \(file.path!) : \(writeError)")
-                    self.failureCallback?(writeError, statusCode!)
-                }
-            }
-            else{
-                file.path = location
-                self.successCallback?(file, statusCode!)
+        
+        if let path = self.loadFile?.path {
+            do {
+                try FileManager.default.copyItem(at: location, to: path)
+                self.loadFile!.status = .success
+                self.successCallback?(self.loadFile, statusCode!)
+            } catch {
+                print("error writing file \(path)",error.localizedDescription)
+                self.loadFile!.status = .fail
+                self.failureCallback?(error, statusCode!)
             }
         }
         else{
-            self.successCallback?(nil, statusCode!)
+            fatalError("No file path for file \(self.loadFile?.fileId ?? "- Load file probaly deinit")")
         }
-        self.loadFile?.status = .success
     }
     
     func urlSessionDidFinishEvents(forBackgroundURLSession session: URLSession) {
@@ -451,24 +416,6 @@ class BackendRequestExecutor: NSObject, URLSessionTaskDelegate,URLSessionDelegat
          }
          }
          */
-    }
-    
-    private func copyFileTemporaryDirectory(file: Data, fileExtension: String ) -> URL?
-    {
-        
-        let tempDirectoryURL = NSURL.fileURL(withPath: NSTemporaryDirectory(), isDirectory: true)
-        
-        // Create a destination URL.
-        let targetURL = tempDirectoryURL.appendingPathComponent("temp.\(fileExtension)")
-        
-        // Copy the file.
-        do {
-            try file.write(to: targetURL)
-            return targetURL
-        } catch let error {
-            NSLog("Unable to copy file: \(error)")
-        }
-        return nil
     }
 }
 

@@ -16,7 +16,7 @@ let BRFileNameConst = "name"
 let BRFileExtensionConst = "extension"
 let BRFilePathConst = "path"
 
-public enum RequestType {
+public enum TaskType {
     case rest
     case upload
     case uploadMultipart
@@ -24,14 +24,12 @@ public enum RequestType {
 }
 
 public enum ParametersEncodingType {
-    
     case multipartBodyURLEncode
     case urlEncode
     case jsonBody
 }
 
 public enum HttpMethod : String{
-    
     case get = "get"
     case put = "put"
     case post = "post"
@@ -39,54 +37,31 @@ public enum HttpMethod : String{
     case insert = "insert"
 }
 
-public protocol UploadFileProtocol : class {
-    
-    var uploadFile: FileLoad?{ get set }
-}
-
-public protocol DownloadFileProtocol {
-    
-    var fileId: String{ get }
-}
-
-public protocol PostDataProtocol {
-    
-    associatedtype GenericEncodableType : Encodable
-    var sendingModel : GenericEncodableType? { get set }
-}
-
-public protocol ManagePostDataProtocol {
-    
-    func setSendingData(data: Encodable)
-    func getEncodedData() -> [String: Any]?
-}
-
-public extension PostDataProtocol{
-    
-    public func encode() -> [String: Any]? {
-        
-        if let jsonData = try? JSONEncoder().encode(sendingModel!){
-            do{
-                return try JSONSerialization.jsonObject(with: jsonData, options: []) as? [String : Any]
-            }
-            catch{
-                return nil
-            }
-        }
-        
-        return [String: Any]()
+public class UploadFile : FileLoad{
+    required convenience init(fileId: String, data: Data, name: String, type: String, fileExtension: String){
+        self.init(fileData: data, fileId: fileId)
+        self.name = name
+        self.type = type
+        self.fileExtension = fileExtension
+        self.mimeType = "\(type)/\(fileExtension)"
     }
 }
 
-public typealias SendingProtocols = PostDataProtocol & ManagePostDataProtocol
+public protocol UploadFileProtocol : class {
+    var uploadFile: UploadFile?{ get set }
+}
+
+public protocol DownloadFileProtocol {
+    var fileId: String{ get set }
+}
 
 public protocol BackgroundModeProtocol { }
 
 /// Every request have to implement this protocol.
 public protocol BackendRequest {
     
-    func endpoint() -> String
-    func specificUrl() -> String?
+    func baseUrl() -> String
+    func route() -> String
     func method() -> HttpMethod
     func headers() -> Dictionary<String, String>?
     
@@ -95,12 +70,22 @@ public protocol BackendRequest {
     /// Type which define how will parameters be encoded
     ///
     /// - Returns: Enum values of enciding type
-    func encodingType() -> ParametersEncodingType?
+    func parametersEncodingType() -> ParametersEncodingType?
     
     /// Return what type of request is
     ///
     /// - Returns: Enums: rest,upload,uploadMultipart,download
-    func requestType() -> RequestType?
+    func taskType() -> TaskType
+}
+
+extension BackendRequest{
+    
+    /// This function set base url for default value read from Plist config file. To override base url, override this function in specific backend request file
+    ///
+    /// - Returns: Base server url
+    public func baseUrl() -> String{
+        return SERVER_URL
+    }
 }
 
 
