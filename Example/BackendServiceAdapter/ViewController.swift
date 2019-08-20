@@ -122,8 +122,8 @@ class ViewController: UIViewController , UIImagePickerControllerDelegate, UINavi
     func uploadFile(fileId: String, path: URL, name: String, type: String, fileExtension: String){
         ServiceRegister.sharedInstance.example.uploadFile(uploadFile: fileId,
                                                           path: path,
-                                                          name: name,
-                                                          type: type,
+                                                          dataName: name,
+                                                          dataFilename: type,
                                                           fileExtension: fileExtension,
                                                           response: { (success) in
                                                             if success{

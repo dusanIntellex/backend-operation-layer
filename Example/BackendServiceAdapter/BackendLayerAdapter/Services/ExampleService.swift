@@ -84,9 +84,9 @@ class ExampleService: BackendService {
         self.queue?.addOperation(operation: operation)
     }
     
-    func uploadFile(uploadFile fileId: String, path: URL, name: String, type: String, fileExtension: String, response: @escaping SuccessCallback,  progress: @escaping (_ file : FileLoad) -> Void){
+    func uploadFile(uploadFile fileId: String, path: URL, dataName: String, dataFilename: String, fileExtension: String, response: @escaping SuccessCallback,  progress: @escaping (_ file : FileLoad) -> Void){
 
-        let operation = BackendOperation(BRUploadExample(fileId: fileId, filePath: path, name: name, type: type, fileExtension: fileExtension))
+        let operation = BackendOperation(BRUploadExample(fileId: fileId, filePath: path, dataName: dataName, dataFilename: dataFilename, fileExtension: fileExtension))
         
         operation.onSuccess = {(json, status) in
             response(true)

@@ -49,27 +49,14 @@ public class UploadFile : FileLoad{
 
 public protocol UploadFileProtocol : class {
     var uploadFile: UploadFile! { get set }
-    
-    /// This init is required for upload protocol
-    ///
-    /// - Parameters:
-    ///   - fileId: Name of upload file
-    ///   - filePath: Path where file is read from
-    ///   - name: Key for sending data
-    ///   - type: Value for 
-    ///   - fileExtension: <#fileExtension description#>
-//    Content-Disposition: form-data; name=#{name}; filename=#{filename} (HTTP Header)
-//    Content-Type: #{mimeType} (HTTP Header)
-    
-    
     /// Required init for upload file
     ///
     /// - Parameters:
     ///   - fileId: Name of the file
     ///   - filePath: URL where file is stored
-    ///   - dataName: <#dataName description#>
-    ///   - dataFilename: <#dataFilename description#>
-    ///   - fileExtension: <#fileExtension description#>
+    ///   - dataName: Content-Disposition: form-data; name=#{dataName}
+    ///   - dataFilename: Content-Disposition: form-data; filename=#{dataFilename}
+    ///   - fileExtension: Content-Type: #{filename/{fileExtension}}
     init(fileId: String, filePath: URL, dataName: String, dataFilename: String, fileExtension: String)
 }
 

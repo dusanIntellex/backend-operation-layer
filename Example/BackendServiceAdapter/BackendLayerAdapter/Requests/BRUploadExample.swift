@@ -10,13 +10,11 @@ import UIKit
 import BackendServiceAdapter
 
 class BRUploadExample : BackendRequest, UploadFileProtocol{
-
+    
     var uploadFile: UploadFile!
-    required init(fileId: String, filePath: URL, name: String, type: String, fileExtension: String) {
-        self.uploadFile = UploadFile(filePath: filePath, fileId: fileId, name: name, type: type, fileExtension: fileExtension)
+    required init(fileId: String, filePath: URL, dataName: String, dataFilename: String, fileExtension: String) {
+        self.uploadFile = UploadFile(filePath: filePath, fileId: fileId, dataName: dataName, dataFilename: dataFilename, fileExtension: fileExtension)
     }
-    
-    
     
     func baseUrl() -> String {
         return "https://www.bidbeds.com/api/v1"
