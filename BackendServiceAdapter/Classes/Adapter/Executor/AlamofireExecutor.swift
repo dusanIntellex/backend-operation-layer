@@ -12,7 +12,7 @@ import Alamofire
 class AlamofireExecutor: NSObject, ExecutorProtocol {
 
     enum Constant: String {
-        case sessionID = "quantox.com.BackendLayerDemo.bgSession"
+        case sessionID = "quantox.com.backgroundSession"
     }
     
     let timeoutInterval = 30.0

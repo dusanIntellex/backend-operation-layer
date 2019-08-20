@@ -11,7 +11,7 @@ import UIKit
 class URLSessionExecutor: NSObject, URLSessionTaskDelegate,URLSessionDelegate, URLSessionDownloadDelegate, ExecutorProtocol {
     
     enum Constant: String {
-        case sessionID = "quantox.com.BackendLayerDemo.bgSession"
+        case sessionID = "quantox.com.backgroundSession"
     }
     
     let timeoutInterval = 60.0
@@ -363,7 +363,6 @@ class URLSessionExecutor: NSObject, URLSessionTaskDelegate,URLSessionDelegate, U
             self.failureCallback?(BackendRequestError.errorDownloadingFile, 1001)
             return;
         }
-        
         
         if let path = self.loadFile?.path {
             do {
