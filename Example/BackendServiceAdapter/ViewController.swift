@@ -20,7 +20,6 @@ class ViewController: UIViewController , UIImagePickerControllerDelegate, UINavi
     override func viewDidLoad() {
         super.viewDidLoad()
         // Do any additional setup after loading the view, typically from a nib.
-        BackendOperation.swizzleHandleSuccess()
         registerForNotifications()
     }
 
@@ -43,7 +42,7 @@ class ViewController: UIViewController , UIImagePickerControllerDelegate, UINavi
                 self?.present(alert, animated: true, completion: nil)
                 
             }, onCompleted: {
-                print("COmpleted")
+                print("Completed")
             }, onDisposed: {
                 print("Disposed")
             })
@@ -51,13 +50,8 @@ class ViewController: UIViewController , UIImagePickerControllerDelegate, UINavi
     }
     
     @IBAction func postRequestAction(_ sender: UIButton) {
-        
-        
-//        let sendingModel = ExampleModel(id: 999991, name: "test")
-        let sendingModel = ExampleModelObject(id: 987456)
-        
-        ServiceRegister.sharedInstance.example.postRestExample(exampleModelObject: sendingModel) { [weak self] (data) in
-            
+        let sendingModel = ExampleModel(id: 999991, name: "test")
+        ServiceRegister.sharedInstance.example.postRestExample(exampleModel: sendingModel) { [weak self] (data) in
             if let dict = data as? [String: Any]{
                 let alert = UIAlertController(title: "Success", message: dict["body"] as? String, preferredStyle: UIAlertControllerStyle.alert)
                 alert.addAction(UIAlertAction(title: "OK", style: UIAlertActionStyle.cancel, handler: nil))
@@ -71,13 +65,11 @@ class ViewController: UIViewController , UIImagePickerControllerDelegate, UINavi
         
         ServiceRegister.sharedInstance.example.downloadFile(response: { [weak self] (downloadedFile) in
             if downloadedFile != nil{
-                let alert = UIAlertController(title: "Success", message: "File successfuly downloaded.\nYou can find it on url: \(downloadedFile?.path?.absoluteString ?? "")", preferredStyle: UIAlertControllerStyle.alert)
-                alert.addAction(UIAlertAction(title: "OK", style: UIAlertActionStyle.cancel, handler: nil))
-                self?.present(alert, animated: true, completion: nil)
-                
-//                if let delegate = UIApplication.shared.delegate as? AppDelegate{
-//                    delegate.postNotification()
-//                }
+                DispatchQueue.main.async { [weak self] in
+                    let alert = UIAlertController(title: "Success", message: "File successfuly downloaded.\nYou can find it on url: \(downloadedFile?.path?.absoluteString ?? "")", preferredStyle: UIAlertControllerStyle.alert)
+                    alert.addAction(UIAlertAction(title: "OK", style: UIAlertActionStyle.cancel, handler: nil))
+                    self?.present(alert, animated: true, completion: nil)
+                }
             }
         }) { [weak self] (file) in
             

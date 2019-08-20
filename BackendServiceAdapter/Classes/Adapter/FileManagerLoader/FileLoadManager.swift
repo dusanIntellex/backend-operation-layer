@@ -41,21 +41,23 @@ public class FileLoadManager: NSObject {
         }
     }
     
-    static func getAllFilesFromTempFolder() -> [FileLoad] {
+    static func getAllFilesFromTempFolder() -> [FileLoad]{
         let docTempDirectory = FileLoadManager.getTempDirectory()
         do{
             let paths = try FileManager.default.contentsOfDirectory(atPath: docTempDirectory.path)
             return paths.compactMap{ path in
-                guard let url = URL(string: path), let data = try? Data(contentsOf: url), !data.isEmpty else{
+                let url = docTempDirectory.appendingPathComponent(path)
+                guard let data = try? Data(contentsOf: url), !data.isEmpty, path != ".DS_Store" else{
                     return nil
                 }
-                return FileLoad(path: url, fileId: url.lastPathComponent)
+                return FileLoad(fileId: url.lastPathComponent, path: url)
             }
         }
         catch{
             print("Failed to get files from \(docTempDirectory.absoluteString)", error.localizedDescription)
-            return []
+            
         }
+        return []
     }
     
     static func deleteFile(_ fileId: String) throws{
@@ -63,9 +65,14 @@ public class FileLoadManager: NSObject {
         try FileManager.default.removeItem(at: path)
     }
     
-    static func writeFile(_ fileId : String, data: Data) throws{
+    static func writeFile(_ fileId : String, data: Data) throws -> URL{
         let path = getTempDirectory().appendingPathComponent(fileId)
         try data.write(to: path, options: .atomic)
+        return path
+    }
+    
+    static func getNewFilePath(_ fileId: String) -> URL{
+        return getTempDirectory().appendingPathComponent(fileId)
     }
     
     

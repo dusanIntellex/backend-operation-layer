@@ -34,14 +34,7 @@ public class FileLoad: NSObject {
     
     @objc public dynamic var status: FileStatus = .pending
     @objc public dynamic var progress: CGFloat = 0.0
-    public var fileId: String?{
-        didSet{
-            if fileId != nil{
-                self.path = FileLoadManager.getTempDirectory().appendingPathComponent(fileId!)
-            }
-        }
-    }
-    
+    public var fileId: String?
     public var path: URL?
     @objc public dynamic var uploadedPath: String?
     public var type: String?
@@ -59,6 +52,12 @@ public class FileLoad: NSObject {
         FilesPool.sharedInstance.addFile(file: self)
     }
     
+    public init(fileId: String, path: URL ){
+        super.init()
+        self.fileId = fileId
+        self.path = path
+    }
+    
     convenience init(fileId: String) {
         self.init()
         self.fileId = fileId
@@ -70,10 +69,11 @@ public class FileLoad: NSObject {
         self.fileId = fileId
     }
     
-    convenience init(path: URL, fileId: String){
+    convenience init(path: URL, fileId: String, data: Data? = nil){
         self.init()
         self.path = path
         self.fileId = fileId
+        self.data = data
     }
     
     convenience init(fileName: String, path: URL, fileExtension: String, fileId: String) {
@@ -82,5 +82,11 @@ public class FileLoad: NSObject {
         self.path = path
         self.fileExtension = fileExtension
         self.fileId = fileId
+    }
+}
+
+extension FileLoad {
+    static func ==(lhs: FileLoad, rhs: FileLoad) -> Bool {
+        return lhs.fileId == rhs.fileId && lhs.fileId != nil && rhs.fileId != nil
     }
 }

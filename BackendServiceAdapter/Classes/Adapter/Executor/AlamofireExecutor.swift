@@ -51,27 +51,19 @@ class AlamofireExecutor: NSObject, ExecutorProtocol {
         let encoding = self.getEncodingType(backendRequest: backendRequest)
         let params = self.getParams(backendRequest: backendRequest)
         
-        if _isDebugAssertConfiguration(){
-            print("""
-            /nBackend service request:
-                Base url:\n\(backendRequest.baseUrl())
-                Route:\n\(backendRequest.route())
-                Method:\n\(backendRequest.method())
-                Headers:\n\(headers)
-                Sending params:\n\(params as AnyObject)
-                Parameters encoding type:\n\(encoding)
-            """)
-        }
+        backendRequest.printRequest()
         
         dataTask = getSession(request: backendRequest).request(url, method: method, parameters: params, encoding:  encoding, headers:headers).responseJSON { (response:DataResponse<Any>) in
             let statusCode = response.response?.statusCode
             
             if _isDebugAssertConfiguration(){
                 print("""
-                    Response for request:
-                    \(response.request?.url?.absoluteString ?? "unknown")
+                    \n---Response for request---
+                    \(response.request?.url?.absoluteString ?? "unknown")\n
+                    Status code:
+                        \(statusCode ?? 0)
                     Result:
-                    \(response.result)
+                    \(response.result.value as AnyObject)
                     """)
             }
             
@@ -99,7 +91,6 @@ class AlamofireExecutor: NSObject, ExecutorProtocol {
     ///   - failureCallback: <#failureCallback description#>
     func downloadFile(backendRequest: BackendRequest, successCallback: @escaping BackendRequestSuccessCallback, failureCallback: @escaping BackendRequestFailureCallback) {
         
-        // File located on disk
         guard backendRequest.taskType() == .download, let fileId = (backendRequest as? DownloadFileProtocol)?.fileId else {
             fatalError("You have not set file id within request. Backend request: \(backendRequest.route()) need to implement Download File protocol")
         }
@@ -110,12 +101,16 @@ class AlamofireExecutor: NSObject, ExecutorProtocol {
         let headers = self.getHeader(backendRequest: backendRequest)
         let params = self.getParams(backendRequest: backendRequest)
         
-        let destination: DownloadRequest.DownloadFileDestination = { _, _ in
-            let documentsURL = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)[0]
-            let fileURL = documentsURL.appendingPathComponent("\(fileId)")
-            file.path = fileURL
-            return (fileURL, [.removePreviousFile, .createIntermediateDirectories])
+        // File located on disk
+        guard let filePath = file.path else {
+            fatalError("Temp file download path is not set")
         }
+        
+        let destination: DownloadRequest.DownloadFileDestination = { tempURL, _ in
+            return (filePath , [.removePreviousFile])
+        }
+        
+        backendRequest.printRequest()
         
         self.dataTask = getSession(request: backendRequest)
             .download(url, method: method, parameters: params, encoding: JSONEncoding.default, headers: headers, to: destination)
@@ -160,6 +155,8 @@ class AlamofireExecutor: NSObject, ExecutorProtocol {
             failureCallback(BackendRequestError.errorCreatingTempFile, 1001)
             return
         }
+        
+        backendRequest.printRequest()
 
         self.dataTask = getSession(request: backendRequest).upload(tempURL, to: url, method: method, headers: headers)
             .uploadProgress { (progress) in
@@ -220,6 +217,8 @@ class AlamofireExecutor: NSObject, ExecutorProtocol {
             return
         }
         
+        backendRequest.printRequest()
+        
         getSession(request: backendRequest).upload(multipartFormData: { (multipartFormData) in
             multipartFormData.append(dataToUpload, withName: file.type ?? "image", fileName: "\(file.name ?? "image").\(file.fileExtension ?? "jpg")", mimeType: file.mimeType ?? "image/jpg")
             
@@ -268,12 +267,12 @@ class AlamofireExecutor: NSObject, ExecutorProtocol {
     
     //MARK:- Private funcs
     private func getUrl(backendRequest: BackendRequest) -> URL{
-        let baseUrl = backendRequest.baseUrl()
-        let urlString = baseUrl.appending(backendRequest.route())
-        guard let endpoint = URL(string: urlString) else{
-            fatalError("Endpoint could not be created from base url \"\(baseUrl)\" and route \"\(backendRequest.route())\"")
+        let baseUrlString = backendRequest.baseUrl()
+        let route = backendRequest.route()
+        guard let baseUrl = URL(string: baseUrlString) else{
+            fatalError("Endpoint could not be created from base url \"\(baseUrlString)\" and route \"\(route)\"")
         }
-        return endpoint
+        return baseUrl.appendingPathComponent(route)
     }
     
     private func getMethod(backendRequest: BackendRequest) -> HTTPMethod{

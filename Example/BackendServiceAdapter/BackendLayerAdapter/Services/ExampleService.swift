@@ -17,7 +17,7 @@ class ExampleService: BackendService {
     //MARK:- Normal request
     func getRestExample(response: @escaping (_ dataResponse: Any?) -> Void){
         
-        let operation = BackendOperation(BackendReqestRegister.Example.rest)
+        let operation = BackendOperation(BRRestSampleRequest())
         
         operation.onSuccess = {(data, status) in
             
@@ -38,28 +38,7 @@ class ExampleService: BackendService {
     
     func postRestExample(exampleModel: ExampleModel, response: @escaping (_ response: Any?) -> Void){
         
-        let operation = BackendOperation(BackendReqestRegister.Example.post)
-        
-        operation.onSuccess = {(data, status) in
-            
-            response(data)
-        }
-        
-        operation.onFailure = {(error, status) in
-            
-            let alert = UIAlertController(title: "Error", message: error.localizedDescription, preferredStyle: UIAlertControllerStyle.alert)
-            alert.addAction(UIAlertAction(title: "OK", style: UIAlertActionStyle.cancel, handler: nil))
-            UIApplication.topViewController().present(alert, animated: true, completion: nil)
-            
-            response(nil)
-        }
-        
-        self.queue?.addOperation(operation: operation)
-    }
-    
-    func postRestExample(exampleModelObject: ExampleModelObject, response: @escaping (_ response: Any?) -> Void){
-        
-        let operation = BackendOperation(BackendReqestRegister.Example.post)
+        let operation = BackendOperation(BRPostSampleRequest(model: exampleModel))
         
         operation.onSuccess = {(data, status) in
             
@@ -80,30 +59,29 @@ class ExampleService: BackendService {
     
     func downloadFile(response: @escaping (_ responseFile: FileLoad?) -> Void, progress: @escaping (_ file : FileLoad) -> Void){
 
-        let operation = BackendOperation(BackendReqestRegister.Example.download)
-        
-        operation.onSuccess = { [weak self] (file, status) in
-            self?.fileController?.unsubscribe(fileId: BackendReqestRegister.Example.download.fileId)
-            response(file as? FileLoad)
-        }
-        
-        operation.onFailure = { [weak self] (error, status) in
-            
-            let alert = UIAlertController(title: "Error", message: error.localizedDescription, preferredStyle: UIAlertControllerStyle.alert)
-            alert.addAction(UIAlertAction(title: "OK", style: UIAlertActionStyle.cancel, handler: nil))
-            UIApplication.topViewController().present(alert, animated: true, completion: nil)
-
-            self?.fileController?.unsubscribe(fileId: BackendReqestRegister.Example.download.fileId)
-            response(nil)
-        }
-        
-        self.queue?.addOperation(operation: operation)
+        let request = BRDownloadExample()
+        let operation = BackendOperation(request)
         
         // Track progress
-        fileController = FileLoadController.init(fileId: BackendReqestRegister.Example.download.fileId)
+        fileController = FileLoadController.init(fileId: request.fileId)
         fileController?.subscribeForFileUpload { (file) in
             progress(file)
         }
+        
+        operation.onSuccess = { (file, status) in
+            response(file as? FileLoad)
+        }
+        
+        operation.onFailure = { (error, status) in
+            DispatchQueue.main.async {
+                let alert = UIAlertController(title: "Error", message: error.localizedDescription, preferredStyle: UIAlertControllerStyle.alert)
+                alert.addAction(UIAlertAction(title: "OK", style: UIAlertActionStyle.cancel, handler: nil))
+                UIApplication.topViewController().present(alert, animated: true, completion: nil)
+            }
+            response(nil)
+        }
+
+        self.queue?.addOperation(operation: operation)
     }
     
     func uploadFile(uploadFile: FileLoad, response: @escaping SuccessCallback,  progress: @escaping (_ file : FileLoad) -> Void){

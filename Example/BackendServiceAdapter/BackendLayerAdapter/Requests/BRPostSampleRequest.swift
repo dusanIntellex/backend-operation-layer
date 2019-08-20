@@ -11,6 +11,18 @@ import BackendServiceAdapter
 
 
 class BRPostSampleRequest : NSObject, BackendRequest{
+    
+    var model : ExampleModel!
+    
+    init(model: ExampleModel) {
+        super.init()
+        self.model = model
+    }
+    
+    func executor() -> RequestExecutorType {
+        return .urlSession
+    }
+    
     func baseUrl() -> String {
         return "https://jsonplaceholder.typicode.com"
     }
@@ -20,26 +32,20 @@ class BRPostSampleRequest : NSObject, BackendRequest{
     }
     
     func method() -> HttpMethod{
-        return .get
+        return .post
     }
     func headers() -> Dictionary<String, String>?{
         return nil
     }
     
     func params() -> [String: Any]?{
-        return nil
+        return EncodingHelper.encode(model: model)
     }
     
-    /// Type which define how will parameters be encoded
-    ///
-    /// - Returns: Enum values of enciding type
-    func parametersEncodingType() -> ParametersEncodingType?{
-        return nil
+    func parametersEncodingType() -> ParametersEncodingType? {
+        return .jsonBody
     }
     
-    /// Return what type of request is
-    ///
-    /// - Returns: Enums: rest,upload,uploadMultipart,download
     func taskType() -> TaskType{
         return .rest
     }

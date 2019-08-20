@@ -20,6 +20,7 @@ public enum ResponseError : Error, Equatable{
     case authorizationError
     case serverMessageError(String)
     case unknownError
+    case badRequest
     case serverError
     case invalidData
     case verifyEmail
@@ -41,10 +42,13 @@ extension ResponseError : LocalizedError{
             return NSLocalizedString("There is error. Please try again!", comment: "")
         case .serverError:
             return NSLocalizedString("We are currently working on this. Try again later.", comment: "")
+        case .badRequest:
+            return NSLocalizedString("Bad request", comment: "")
         case .invalidData:
             return NSLocalizedString("Invalid data", comment: "")
         case .verifyEmail:
             return NSLocalizedString("Need to verify email", comment: "")
+            
         case .badLoginCredentials:
             return NSLocalizedString("Invalid credentials", comment: "")
         case .invalidRegisterInputData(let errorList):
@@ -65,8 +69,14 @@ extension ResponseError : LocalizedError{
 public class BackendOperation: AsyncOperation {
     
     lazy var executor: ExecutorProtocol = {
-        return AlamofireExecutor()
-//        return BackendRequestExecutor()
+        switch request.executor(){
+        case .alamofire:
+            return AlamofireExecutor()
+        case .urlSession:
+            return URLSessionExecutor()
+        default:
+            return AlamofireExecutor()
+        }
     }()
     
     var request: BackendRequest!
@@ -83,16 +93,12 @@ public class BackendOperation: AsyncOperation {
 
     //MARK:- Start
     override public func execute() {
-        
         // Check connection
         guard Reachability.isConnectedToNetwork() else{
-            
             if (self.onFailure != nil){
                 onFailure!(ResponseError.noInternetConnection,0)
             }
-            
             self.finish()
-
             return
         }
         
@@ -121,7 +127,6 @@ public class BackendOperation: AsyncOperation {
     }
     
     func upload() {
-        
         self.executor.uploadFile(backendRequest: self.request!, successCallback: { [weak self] (data, code) in
             self?.handleSuccess(data: data, statusCode: code)
         }, failureCallback: { [weak self] (error, code) in
@@ -130,7 +135,6 @@ public class BackendOperation: AsyncOperation {
     }
     
     func uploadMultipart(){
-        
         self.executor.uploadMultipart(backendRequest: self.request!, successCallback: { [weak self] (data, code) in
             self?.handleSuccess(data: data, statusCode: code)
         }, failureCallback: { [weak self] (error, code) in
@@ -139,7 +143,6 @@ public class BackendOperation: AsyncOperation {
     }
     
     func download() {
-        
         self.executor.downloadFile(backendRequest: self.request!, successCallback: { [weak self] (data, code) in
             self?.handleSuccess(data: data, statusCode: code)
         }, failureCallback: { [weak self] (error, code) in
@@ -150,9 +153,7 @@ public class BackendOperation: AsyncOperation {
     //MARK:- Cancel
     
     override public func cancel() {
-        
         self.executor.cancel()
-        
         if (self.onFailure != nil){
             onFailure!(ResponseError.requestCancel,0)
         }
@@ -175,9 +176,9 @@ public class BackendOperation: AsyncOperation {
             self.onSuccess!(data, statusCode)
         }
         else if 300..<500 ~= statusCode{
-            self.onFailure?(ResponseError.badLoginCredentials, statusCode)
+            self.onFailure?(ResponseError.badRequest, statusCode)
         }
-        else if statusCode >= 500{
+        else if 500...599 ~= statusCode{
             self.onFailure?(ResponseError.serverError, statusCode)
         }
         else{
@@ -186,7 +187,6 @@ public class BackendOperation: AsyncOperation {
     }
     
     func handleFailure(error: Error?, statusCode: NSInteger){
-        
         if self.onFailure != nil{
             self.onFailure!(error ?? ResponseError.unknownError , statusCode)
         }

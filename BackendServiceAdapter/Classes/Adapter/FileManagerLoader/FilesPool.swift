@@ -11,25 +11,23 @@ import UIKit
 class FilesPool: NSObject {
     
     // MARK:- Properties
-    private var pool: [FileLoad]
-    static let sharedInstance: FilesPool = {
-        let instance = FilesPool()
-        return instance
+    lazy var pool : [FileLoad] = {
+        return FileLoadManager.getAllFilesFromTempFolder()
     }()
-    
-    //MARK:- Init
-    
-    override init() {
-        pool = FileLoadManager.getAllFilesFromTempFolder()
-    }
+    static let sharedInstance: FilesPool = {
+        return FilesPool()
+    }()
     
     //MARK:- Public
     
     public func addFile(file: FileLoad){
-        self.pool.append(file)
+        if (self.pool.filter{ $0.fileId == file.fileId }.isEmpty){
+            self.pool.append(file)
+        }
     }
  
     public func getFile(fileId: String, _ data: Data? = nil) -> FileLoad{
+
         let file = pool.first{ $0.fileId == fileId }
         
         //Update file
@@ -40,9 +38,15 @@ class FilesPool: NSObject {
         //Create new file with data or empty data
         else if file == nil{
             do{
-                let data = data ?? Data()
-                try FileLoadManager.writeFile(fileId, data: data)
-                return FileLoad(fileData: data, fileId: fileId)
+                if data != nil{
+                    let path = try FileLoadManager.writeFile(fileId, data: data!)
+                    return FileLoad(path: path, fileId: fileId, data: data)
+                }
+                else{
+                    let newFile = FileLoad(fileId: fileId)
+                    newFile.path = FileLoadManager.getNewFilePath(fileId)
+                    return newFile
+                }
             }
             catch{
                 fatalError(error.localizedDescription)

@@ -37,19 +37,11 @@ public class FileLoadController: NSObject {
     }
     
     deinit {
-        for path in keyPaths{
-            file?.removeObserver(self, forKeyPath: path)
-        }
+        unsubscribeAll()
     }
     
     public func unsubscribeAll(){
         for path in keyPaths{   
-            file?.removeObserver(self, forKeyPath: path)
-        }
-    }
-    
-    public func unsubscribe(fileId: String){
-        for path in keyPaths{
             file?.removeObserver(self, forKeyPath: path)
         }
     }

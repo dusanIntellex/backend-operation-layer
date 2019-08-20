@@ -57,9 +57,16 @@ public protocol DownloadFileProtocol {
 
 public protocol BackgroundModeProtocol { }
 
+public enum RequestExecutorType{
+    case alamofire
+    case urlSession
+    case firebase
+}
+
 /// Every request have to implement this protocol.
-public protocol BackendRequest {
+public protocol BackendRequest{
     
+    func executor() -> RequestExecutorType
     func baseUrl() -> String
     func route() -> String
     func method() -> HttpMethod
@@ -69,7 +76,7 @@ public protocol BackendRequest {
     
     /// Type which define how will parameters be encoded
     ///
-    /// - Returns: Enum values of enciding type
+    /// - Returns: Enums: multipartBodyURLEncode, urlEncode, jsonBody
     func parametersEncodingType() -> ParametersEncodingType?
     
     /// Return what type of request is
@@ -80,11 +87,43 @@ public protocol BackendRequest {
 
 extension BackendRequest{
     
+    /// This is default executor. If you want to override this, in Backlend request implementation, override this function in specific backend request
+    ///
+    /// - Returns: enums : alamofire, urlSession, firebase
+    public func executor() -> RequestExecutorType{
+        return .alamofire
+    }
+    
     /// This function set base url for default value read from Plist config file. To override base url, override this function in specific backend request file
     ///
     /// - Returns: Base server url
     public func baseUrl() -> String{
         return SERVER_URL
+    }
+}
+
+extension BackendRequest {
+    func printRequest() {
+        var header = [String : Any]()
+        _ = COMMON_HEADERS.map{
+            header.updateValue($0.value, forKey: $0.key)
+        }
+        if let headers = self.headers(){
+            for dict in headers {
+                header.updateValue(dict.value, forKey: dict.key)
+            }
+        }
+        if _isDebugAssertConfiguration(){
+            print("""
+            \n***Backend service request***\n
+            Base url:\n    \(self.baseUrl())
+            Route:\n    \(self.route())
+            Method:\n    \(self.method())
+            Headers:\n\(header as AnyObject)
+            Sending params:\n\(self.params() as AnyObject)
+            Parameters encoding type:\n    \(String(describing: self.parametersEncodingType())) \n
+            """)
+        }
     }
 }
 

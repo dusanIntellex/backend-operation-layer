@@ -45,26 +45,18 @@ class URLSessionExecutor: NSObject, URLSessionTaskDelegate,URLSessionDelegate, U
         let request = self.requestWithBackendRequest(backendRequest: backendRequest)
         let session = getSession(request: backendRequest)
         
-        if _isDebugAssertConfiguration(){
-            print("""
-                /nBackend service request:
-                Base url:\n\(backendRequest.baseUrl())
-                Route:\n\(backendRequest.route())
-                Method:\n\(backendRequest.method())
-                Headers:\n\(backendRequest.headers() as AnyObject)
-                Sending params:\n\(backendRequest.params() as AnyObject)
-                Parameters encoding type:\n\(backendRequest.parametersEncodingType().debugDescription)
-                """)
-        }
+        backendRequest.printRequest()
         
         dataTask = session.dataTask(with: request, completionHandler: { (data, response, error) in
             
             if _isDebugAssertConfiguration(){
                 print("""
-                    Response for request:
-                    \(response?.url?.absoluteString ?? "unknown")
+                    \n---Response for request---
+                    \(response?.url?.absoluteString ?? "unknown")\n
+                    Status code:
+                        \((response as! HTTPURLResponse).statusCode)
                     Result:
-                    \(response.debugDescription)
+                    \(String(describing: try? JSONSerialization.jsonObject(with: data!, options: .allowFragments)))
                     """)
             }
             
@@ -114,6 +106,8 @@ class URLSessionExecutor: NSObject, URLSessionTaskDelegate,URLSessionDelegate, U
         
         let request = self.requestWithBackendRequest(backendRequest: backendRequest)
         
+        backendRequest.printRequest()
+        
         dataTask = session.downloadTask(with: request)
         dataTask?.resume()
     }
@@ -146,6 +140,8 @@ class URLSessionExecutor: NSObject, URLSessionTaskDelegate,URLSessionDelegate, U
             failureCallback(BackendRequestError.errorCreatingTempFile, 1001)
             return
         }
+        
+        backendRequest.printRequest()
         
         self.dataTask = session.uploadTask(with: request, fromFile: tempURL) // session.uploadTask(with: request, from: file.data!)
         self.dataTask?.resume()
@@ -180,6 +176,8 @@ class URLSessionExecutor: NSObject, URLSessionTaskDelegate,URLSessionDelegate, U
             return
         }
         
+        backendRequest.printRequest()
+        
         self.dataTask = session.uploadTask(with: request as URLRequest, fromFile: tempURL) // session.uploadTask(with: request, from: file.data!)
         self.dataTask?.resume()
     }
@@ -203,12 +201,12 @@ class URLSessionExecutor: NSObject, URLSessionTaskDelegate,URLSessionDelegate, U
     }
     
     private func getUrl(backendRequest: BackendRequest) -> URL{
-        let baseUrl = backendRequest.baseUrl()
-        let urlString = baseUrl.appending(backendRequest.route())
-        guard let endpoint = URL(string: urlString) else{
-            fatalError("Endpoint could not be created from base url \"\(baseUrl)\" and route \"\(backendRequest.route())\"")
+        let baseUrlString = backendRequest.baseUrl()
+        let route = backendRequest.route()
+        guard let baseUrl = URL(string: baseUrlString) else{
+            fatalError("Endpoint could not be created from base url \"\(baseUrlString)\" and route \"\(route)\"")
         }
-        return endpoint
+        return baseUrl.appendingPathComponent(route)
     }
     
     private func setHeaders(backendRequest: BackendRequest, for request:NSMutableURLRequest){
@@ -369,6 +367,9 @@ class URLSessionExecutor: NSObject, URLSessionTaskDelegate,URLSessionDelegate, U
         
         if let path = self.loadFile?.path {
             do {
+                if FileManager.default.fileExists(atPath: path.relativePath){
+                    try FileManager.default.removeItem(at: path)
+                }
                 try FileManager.default.copyItem(at: location, to: path)
                 self.loadFile!.status = .success
                 self.successCallback?(self.loadFile, statusCode!)

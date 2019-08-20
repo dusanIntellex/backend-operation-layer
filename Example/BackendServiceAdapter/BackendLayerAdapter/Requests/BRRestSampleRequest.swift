@@ -12,8 +12,15 @@ import BackendServiceAdapter
 
 class BRRestSampleRequest: NSObject , BackendRequest{
     
+    func executor() -> RequestExecutorType {
+        return .urlSession
+    }
+    
+    func baseUrl() -> String {
+        return "https://jsonplaceholder.typicode.com"
+    }
     func route() -> String {
-        return "test"
+        return "todos/1"
     }
     
     func method() -> HttpMethod {

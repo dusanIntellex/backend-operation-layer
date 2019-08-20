@@ -9,13 +9,11 @@
 import Foundation
 import BackendServiceAdapter
 
-public extension BackendOperation{
+extension BackendOperation{
     
     //MARK:- Custom handler response
     @objc func customHandleResponseData(data: Any?, statusCode: NSInteger){
-        print("This is swizzle method")
         if self.onSuccess != nil{
-            
             if 200 ... 299 ~= statusCode{
                 self.onSuccess!(data, statusCode)
             }
@@ -26,7 +24,7 @@ public extension BackendOperation{
         
         self.finish()
     }
-
+    
     //MARK:- Refresh token
     private func refreshToken(){
         // TODO: You can add this funciton on any status code and recall previous request if everything is ok

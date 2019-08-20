@@ -14,7 +14,11 @@ class BRDownloadExample: BackendRequest, DownloadFileProtocol, BackgroundModePro
     var fileId: String
     
     init() {
-        self.fileId = "downloadFile\(Date().timeIntervalSince1970)"
+        self.fileId = "downloadFile12"
+    }
+    
+    func executor() -> RequestExecutorType {
+        return .urlSession
     }
     
     func baseUrl() -> String {
