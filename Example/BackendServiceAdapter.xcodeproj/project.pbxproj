@@ -10,9 +10,8 @@
 		1821593C21072E58004E3165 /* ExampleModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1821593121072E57004E3165 /* ExampleModel.swift */; };
 		1821593D21072E58004E3165 /* BRUploadExample.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1821593321072E57004E3165 /* BRUploadExample.swift */; };
 		1821593E21072E58004E3165 /* BRDownloadExample.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1821593421072E57004E3165 /* BRDownloadExample.swift */; };
-		1821594021072E58004E3165 /* BRRestSampleRequest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1821593621072E57004E3165 /* BRRestSampleRequest.swift */; };
+		1821594021072E58004E3165 /* BRGetSampleRequest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1821593621072E57004E3165 /* BRGetSampleRequest.swift */; };
 		1821594121072E58004E3165 /* BRPostSampleRequest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1821593721072E57004E3165 /* BRPostSampleRequest.swift */; };
-		1821594221072E58004E3165 /* BRSendigExample.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1821593821072E57004E3165 /* BRSendigExample.swift */; };
 		1821594321072E58004E3165 /* ServiceRegister.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1821593A21072E57004E3165 /* ServiceRegister.swift */; };
 		1821594421072E58004E3165 /* ExampleService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1821593B21072E57004E3165 /* ExampleService.swift */; };
 		1821594621074DF9004E3165 /* AlertHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1821594521074DF8004E3165 /* AlertHelper.swift */; };
@@ -44,9 +43,8 @@
 		1821593121072E57004E3165 /* ExampleModel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ExampleModel.swift; sourceTree = "<group>"; };
 		1821593321072E57004E3165 /* BRUploadExample.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BRUploadExample.swift; sourceTree = "<group>"; };
 		1821593421072E57004E3165 /* BRDownloadExample.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BRDownloadExample.swift; sourceTree = "<group>"; };
-		1821593621072E57004E3165 /* BRRestSampleRequest.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BRRestSampleRequest.swift; sourceTree = "<group>"; };
+		1821593621072E57004E3165 /* BRGetSampleRequest.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BRGetSampleRequest.swift; sourceTree = "<group>"; };
 		1821593721072E57004E3165 /* BRPostSampleRequest.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BRPostSampleRequest.swift; sourceTree = "<group>"; };
-		1821593821072E57004E3165 /* BRSendigExample.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BRSendigExample.swift; sourceTree = "<group>"; };
 		1821593A21072E57004E3165 /* ServiceRegister.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ServiceRegister.swift; sourceTree = "<group>"; };
 		1821593B21072E57004E3165 /* ExampleService.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ExampleService.swift; sourceTree = "<group>"; };
 		1821594521074DF8004E3165 /* AlertHelper.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AlertHelper.swift; sourceTree = "<group>"; };
@@ -119,9 +117,8 @@
 			children = (
 				1821593321072E57004E3165 /* BRUploadExample.swift */,
 				1821593421072E57004E3165 /* BRDownloadExample.swift */,
-				1821593621072E57004E3165 /* BRRestSampleRequest.swift */,
+				1821593621072E57004E3165 /* BRGetSampleRequest.swift */,
 				1821593721072E57004E3165 /* BRPostSampleRequest.swift */,
-				1821593821072E57004E3165 /* BRSendigExample.swift */,
 			);
 			path = Requests;
 			sourceTree = "<group>";
@@ -383,7 +380,6 @@
 				1821594421072E58004E3165 /* ExampleService.swift in Sources */,
 				18797034230AAC1F00AACA1C /* DecodingHelper.swift in Sources */,
 				607FACD81AFB9204008FA782 /* ViewController.swift in Sources */,
-				1821594221072E58004E3165 /* BRSendigExample.swift in Sources */,
 				1821594321072E58004E3165 /* ServiceRegister.swift in Sources */,
 				1821594121072E58004E3165 /* BRPostSampleRequest.swift in Sources */,
 				189EE23322369D1C00FE7F21 /* BackendOperationHandleSuccess.swift in Sources */,
@@ -393,7 +389,7 @@
 				1821593D21072E58004E3165 /* BRUploadExample.swift in Sources */,
 				607FACD61AFB9204008FA782 /* AppDelegate.swift in Sources */,
 				1821593C21072E58004E3165 /* ExampleModel.swift in Sources */,
-				1821594021072E58004E3165 /* BRRestSampleRequest.swift in Sources */,
+				1821594021072E58004E3165 /* BRGetSampleRequest.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

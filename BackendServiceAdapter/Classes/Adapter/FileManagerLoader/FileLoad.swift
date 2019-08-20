@@ -52,7 +52,7 @@ public class FileLoad: NSObject {
         FilesPool.sharedInstance.addFile(file: self)
     }
     
-    public init(fileId: String, path: URL ){
+    init(fileId: String, path: URL ){
         super.init()
         self.fileId = fileId
         self.path = path

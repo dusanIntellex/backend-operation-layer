@@ -10,8 +10,11 @@ import UIKit
 import BackendServiceAdapter
 
 class BRUploadExample : BackendRequest, UploadFileProtocol{
-    
-    var uploadFile: UploadFile?
+
+    var uploadFile: UploadFile!
+    required init(fileId: String, data: Data, name: String, type: String, fileExtension: String) {
+        self.uploadFile = UploadFile(fileId: fileId, data: data, name: name, type: type, fileExtension: fileExtension)
+    }
     
     func baseUrl() -> String {
         return "https://www.googleapis.com"

@@ -38,7 +38,7 @@ public enum HttpMethod : String{
 }
 
 public class UploadFile : FileLoad{
-    required convenience init(fileId: String, data: Data, name: String, type: String, fileExtension: String){
+    public convenience init(fileId: String, data: Data, name: String, type: String, fileExtension: String){
         self.init(fileData: data, fileId: fileId)
         self.name = name
         self.type = type
@@ -48,11 +48,13 @@ public class UploadFile : FileLoad{
 }
 
 public protocol UploadFileProtocol : class {
-    var uploadFile: UploadFile?{ get set }
+    var uploadFile: UploadFile! { get set }
+    init(fileId: String, data: Data, name: String, type: String, fileExtension: String)
 }
 
 public protocol DownloadFileProtocol {
     var fileId: String{ get set }
+    init(fileId: String)
 }
 
 public protocol BackgroundModeProtocol { }

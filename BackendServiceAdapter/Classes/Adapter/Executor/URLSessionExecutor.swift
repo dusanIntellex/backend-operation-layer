@@ -14,7 +14,7 @@ class URLSessionExecutor: NSObject, URLSessionTaskDelegate,URLSessionDelegate, U
         case sessionID = "quantox.com.backgroundSession"
     }
     
-    let timeoutInterval = 60.0
+    let timeoutInterval = 30.0
     private lazy var regularSession: URLSession = { [weak self] in
         
         let config = URLSessionConfiguration.default

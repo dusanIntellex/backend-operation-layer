@@ -12,9 +12,8 @@ import BackendServiceAdapter
 class BRDownloadExample: BackendRequest, DownloadFileProtocol, BackgroundModeProtocol{
     
     var fileId: String
-    
-    init() {
-        self.fileId = "downloadFile12"
+    required init(fileId: String) {
+        self.fileId = fileId
     }
     
     func executor() -> RequestExecutorType {

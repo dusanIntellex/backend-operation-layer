@@ -17,7 +17,7 @@ class ExampleService: BackendService {
     //MARK:- Normal request
     func getRestExample(response: @escaping (_ dataResponse: Any?) -> Void){
         
-        let operation = BackendOperation(BRRestSampleRequest())
+        let operation = BackendOperation(BRGetSampleRequest())
         
         operation.onSuccess = {(data, status) in
             
@@ -59,7 +59,7 @@ class ExampleService: BackendService {
     
     func downloadFile(response: @escaping (_ responseFile: FileLoad?) -> Void, progress: @escaping (_ file : FileLoad) -> Void){
 
-        let request = BRDownloadExample()
+        let request = BRDownloadExample(fileId: "example file")
         let operation = BackendOperation(request)
         
         // Track progress
@@ -122,6 +122,6 @@ class ExampleService: BackendService {
     
     //MARK:- Rx Requests
     func getRestExample() -> Observable<ExampleGetModel>{
-        return self.rx.parse(request: BRRestSampleRequest(), type: ExampleGetModel.self)
+        return self.rx.parse(request: BRGetSampleRequest(), type: ExampleGetModel.self)
     }
 }

@@ -10,7 +10,7 @@ import UIKit
 import BackendServiceAdapter
 
 
-class BRRestSampleRequest: NSObject , BackendRequest{
+class BRGetSampleRequest: NSObject , BackendRequest{
     
     func executor() -> RequestExecutorType {
         return .urlSession
