@@ -102,56 +102,61 @@ class ViewController: UIViewController , UIImagePickerControllerDelegate, UINavi
     }
     
     func imagePickerController(_ picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [String : Any]) {
-        ImageUploadHelper.createUploadFile(imageInfo: info as [String : Any], imageSource: picker.sourceType,
-                                           response: { [weak self] file in
-                                            if file != nil{
-                                                self?.uploadFile(file: file!)
-                                            }
-            },
-                                           error: { [weak self] error in
-                                            let alert = UIAlertController(title: "Error", message: error.localizedDescription, preferredStyle: UIAlertControllerStyle.alert)
-                                            alert.addAction(UIAlertAction(title: "OK", style: UIAlertActionStyle.cancel, handler: nil))
-                                            self?.present(alert, animated: true, completion: nil)
-        })
+
+        print(info)
+//        FileUploadHelper.createUploadFile(imageInfo: info as [String : Any], imageSource: picker.sourceType,
+//                                           response: { [weak self] file in
+//                                            if file != nil{
+//                                                self?.uploadFile(file: file!)
+//                                            }
+//            },
+//                                           error: { [weak self] error in
+//                                            let alert = UIAlertController(title: "Error", message: error.localizedDescription, preferredStyle: UIAlertControllerStyle.alert)
+//                                            alert.addAction(UIAlertAction(title: "OK", style: UIAlertActionStyle.cancel, handler: nil))
+//                                            self?.present(alert, animated: true, completion: nil)
+//        })
         
         picker.dismiss(animated: true, completion: nil)
     }
     
-    func uploadFile(file: FileLoad){
-        
-        ServiceRegister.sharedInstance.example.uploadFile(uploadFile: file, response: { [weak self] (success) in
-            
-            if success{
-                let alert = UIAlertController(title: "Success", message: "File successfuly uploaded", preferredStyle: UIAlertControllerStyle.alert)
-                alert.addAction(UIAlertAction(title: "OK", style: UIAlertActionStyle.cancel, handler: nil))
-                self?.present(alert, animated: true, completion: nil)
-            }
-            
-        }) { [weak self] (file) in
-            
-            DispatchQueue.main.async {
-                self?.loadProgressLabel.text = "\(Double(round(100*file.progress))/100)"
-                
-                switch file.status{
-                case .pending:
-                    self?.loadProgressLabel.textColor = UIColor.lightGray
-                    break
-                case .fail:
-                    self?.loadProgressLabel.textColor = UIColor.red
-                    break
-                case .success:
-                    self?.loadProgressLabel.textColor = UIColor.green
-                    break
-                case .progress:
-                    self?.loadProgressLabel.textColor = UIColor.blue
-                    break
-                default:
-                    self?.loadProgressLabel.textColor = UIColor.gray
-                    break
-                }
-            }
-        }
-        
+    func uploadFile(fileId: String, path: URL, name: String, type: String, fileExtension: String){
+        ServiceRegister.sharedInstance.example.uploadFile(uploadFile: fileId,
+                                                          path: path,
+                                                          name: name,
+                                                          type: type,
+                                                          fileExtension: fileExtension,
+                                                          response: { (success) in
+                                                            if success{
+                                                                DispatchQueue.main.async { [weak self] in
+                                                                    let alert = UIAlertController(title: "Success", message: "File successfuly uploaded", preferredStyle: UIAlertControllerStyle.alert)
+                                                                    alert.addAction(UIAlertAction(title: "OK", style: UIAlertActionStyle.cancel, handler: nil))
+                                                                    self?.present(alert, animated: true, completion: nil)
+                                                                }
+                                                            }
+        },
+                                                          progress: { [weak self] file in
+                                                            DispatchQueue.main.async {
+                                                                self?.loadProgressLabel.text = "\(Double(round(100*file.progress))/100)"
+                                                                
+                                                                switch file.status{
+                                                                case .pending:
+                                                                    self?.loadProgressLabel.textColor = UIColor.lightGray
+                                                                    break
+                                                                case .fail:
+                                                                    self?.loadProgressLabel.textColor = UIColor.red
+                                                                    break
+                                                                case .success:
+                                                                    self?.loadProgressLabel.textColor = UIColor.green
+                                                                    break
+                                                                case .progress:
+                                                                    self?.loadProgressLabel.textColor = UIColor.blue
+                                                                    break
+                                                                default:
+                                                                    self?.loadProgressLabel.textColor = UIColor.gray
+                                                                    break
+                                                                }
+                                                            }
+        })
     }
     
     func getImage(){
@@ -159,7 +164,7 @@ class ViewController: UIViewController , UIImagePickerControllerDelegate, UINavi
         let imagePicker = UIImagePickerController()
         imagePicker.delegate = self
         imagePicker.allowsEditing = true
-        imagePicker.mediaTypes = [kUTTypeMovie as String]
+//        imagePicker.mediaTypes = [kUTTypeMP3 as String]
         
         AlertHelper.alertWithTwoOptionsAndCancel(NSLocalizedString("Select file to upload", comment: ""), message: NSLocalizedString("Select source ", comment: ""), closeTitle: NSLocalizedString("Photos", comment: ""), actionTitle: NSLocalizedString("Camera", comment: ""), closeButton: {
             

@@ -32,7 +32,13 @@ class FilesPool: NSObject {
         
         //Update file
         if file != nil, data != nil{
-            file!.data = data
+            do{
+                _ = try FileLoadManager.writeFile(fileId, data: data!)
+                return file!
+            }
+            catch{
+                fatalError(error.localizedDescription)
+            }
         }
             
         //Create new file with data or empty data
@@ -40,7 +46,7 @@ class FilesPool: NSObject {
             do{
                 if data != nil{
                     let path = try FileLoadManager.writeFile(fileId, data: data!)
-                    return FileLoad(path: path, fileId: fileId, data: data)
+                    return FileLoad(path: path, fileId: fileId)
                 }
                 else{
                     let newFile = FileLoad(fileId: fileId)

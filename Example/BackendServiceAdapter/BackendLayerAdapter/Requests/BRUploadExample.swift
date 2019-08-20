@@ -12,18 +12,18 @@ import BackendServiceAdapter
 class BRUploadExample : BackendRequest, UploadFileProtocol{
 
     var uploadFile: UploadFile!
-    required init(fileId: String, data: Data, name: String, type: String, fileExtension: String) {
-        self.uploadFile = UploadFile(fileId: fileId, data: data, name: name, type: type, fileExtension: fileExtension)
+    required init(fileId: String, filePath: URL, name: String, type: String, fileExtension: String) {
+        self.uploadFile = UploadFile(filePath: filePath, fileId: fileId, name: name, type: type, fileExtension: fileExtension)
     }
     
+    
+    
     func baseUrl() -> String {
-        return "https://www.googleapis.com"
+        return "https://www.bidbeds.com/api/v1"
     }
     
     func route() -> String {
-        return "upload/drive/v3/files"
-        //        return "https://www.googleapis.com/?uploadType=media"
-//        return "/upload/drive/v3/files?uploadType=multipart"
+        return "user/84/image"
     }
     
     func method() -> HttpMethod {
@@ -31,10 +31,7 @@ class BRUploadExample : BackendRequest, UploadFileProtocol{
     }
     
     func headers() -> Dictionary<String, String>? {
-        //        let token = GIDSignIn.sharedInstance().currentUser.authentication.accessToken ?? ""
-        //        print(token)
-        return ["Authorization" : "Bearer \("token")",
-            "Content-Type": "multipart/related; boundary=foo_bar_baz"]
+        return ["Authorization" : "Bearer 8d10192eb4f3bbad57882278841350b5ccfb9768"]
     }
     
     func taskType() -> TaskType {

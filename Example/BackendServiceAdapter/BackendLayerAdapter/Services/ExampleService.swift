@@ -84,40 +84,30 @@ class ExampleService: BackendService {
         self.queue?.addOperation(operation: operation)
     }
     
-    func uploadFile(uploadFile: FileLoad, response: @escaping SuccessCallback,  progress: @escaping (_ file : FileLoad) -> Void){
+    func uploadFile(uploadFile fileId: String, path: URL, name: String, type: String, fileExtension: String, response: @escaping SuccessCallback,  progress: @escaping (_ file : FileLoad) -> Void){
+
+        let operation = BackendOperation(BRUploadExample(fileId: fileId, filePath: path, name: name, type: type, fileExtension: fileExtension))
         
-        /*
-        GoogleClient.authorize { [weak self] (success) in
-
-            if success{
-
-                // Track progress
-                self?.fileController = FileLoadController.init(fileId: uploadFile.fileId ?? "")
-                self?.fileController?.subscribeForFileUpload { (file) in
-                    progress(file)
-                }
-                
-                let operation = BackendOperation(model: nil, request: BackendReqestRegister.Example.upload, uploadFile)
-                
-                operation.onSuccess = {(json, status) in
-                    
-                    self?.fileController?.unsubscribe(fileId: uploadFile.fileId ?? "", removeFromPool: true)
-                    response(true)
-                }
-                
-                operation.onFailure = {(error, status) in
-                    
-                    let alert = UIAlertController(title: "Error", message: error?.localizedDescription, preferredStyle: UIAlertControllerStyle.alert)
-                    alert.addAction(UIAlertAction(title: "OK", style: UIAlertActionStyle.cancel, handler: nil))
-                    UIApplication.topViewController().present(alert, animated: true, completion: nil)
-                    self?.fileController?.unsubscribe(fileId: uploadFile.fileId ?? "", removeFromPool: true)
-                    response(false)
-                }
-                
-                self?.queue?.addOperation(operation: operation)
-            }
+        operation.onSuccess = {(json, status) in
+            response(true)
         }
-         */
+        
+        operation.onFailure = {(error, status) in
+            DispatchQueue.main.async {
+                let alert = UIAlertController(title: "Error", message: error.localizedDescription, preferredStyle: UIAlertControllerStyle.alert)
+                alert.addAction(UIAlertAction(title: "OK", style: UIAlertActionStyle.cancel, handler: nil))
+                UIApplication.topViewController().present(alert, animated: true, completion: nil)
+            }
+            response(false)
+        }
+        
+        // Track progress
+        self.fileController = FileLoadController.init(fileId: fileId)
+        self.fileController?.subscribeForFileUpload { (file) in
+            progress(file)
+        }
+        
+        self.queue?.addOperation(operation: operation)
     }
     
     //MARK:- Rx Requests

@@ -143,7 +143,7 @@ class URLSessionExecutor: NSObject, URLSessionTaskDelegate,URLSessionDelegate, U
         
         backendRequest.printRequest()
         
-        self.dataTask = session.uploadTask(with: request, fromFile: tempURL) // session.uploadTask(with: request, from: file.data!)
+        self.dataTask = session.uploadTask(with: request, fromFile: tempURL)
         self.dataTask?.resume()
     }
     
@@ -153,21 +153,6 @@ class URLSessionExecutor: NSObject, URLSessionTaskDelegate,URLSessionDelegate, U
             fatalError("You have not set file id within request. Backend request: \(backendRequest.route()) need to implement Download File protocol")
         }
         
-        var request = requestWithBackendRequest(backendRequest: backendRequest)
-        
-        let boundary = "Boundary-\(UUID().uuidString)"
-        request.setValue("multipart/form-data; boundary=\(boundary)", forHTTPHeaderField: "Content-Type")
-        
-        let params = getParams(backendRequest: backendRequest)
-        
-        request.httpBody = createBody(parameters: params, boundary: boundary, data: file.data!, mimeType: file.mimeType ?? "image/jpg", name: file.name ?? "image", filename: file.name ?? "untitled")
-        
-        let session = getSession(request: backendRequest)
-        
-        self.loadFile = file
-        self.successCallback = successCallback
-        self.failureCallback = failureCallback
-        
         guard let tempURL = file.path else{
             if _isDebugAssertConfiguration(){
                 print("Can not create temp url path!. Upload file: \(file.fileId ?? "")")
@@ -176,9 +161,32 @@ class URLSessionExecutor: NSObject, URLSessionTaskDelegate,URLSessionDelegate, U
             return
         }
         
+        guard let data = try? Data(contentsOf: tempURL) else{
+            if _isDebugAssertConfiguration(){
+                print("Can not get data from url path - \(tempURL). Upload file: \(file.fileId ?? "")")
+            }
+            failureCallback(BackendRequestError.errorCreatingTempFile, 1001)
+            return
+        }
+        
+        var request = requestWithBackendRequest(backendRequest: backendRequest)
+        
+        let boundary = "Boundary-\(UUID().uuidString)"
+        request.setValue("multipart/form-data; boundary=\(boundary)", forHTTPHeaderField: "Content-Type")
+        
+        let params = getParams(backendRequest: backendRequest)
+        
+        request.httpBody = createBody(parameters: params, boundary: boundary, data: data, mimeType: file.mimeType ?? "image/jpg", name: file.dataName ?? "image", filename: file.dataFilename ?? "untitled")
+        
+        let session = getSession(request: backendRequest)
+        
+        self.loadFile = file
+        self.successCallback = successCallback
+        self.failureCallback = failureCallback
+        
         backendRequest.printRequest()
         
-        self.dataTask = session.uploadTask(with: request as URLRequest, fromFile: tempURL) // session.uploadTask(with: request, from: file.data!)
+        self.dataTask = session.uploadTask(with: request as URLRequest, fromFile: tempURL)
         self.dataTask?.resume()
     }
     

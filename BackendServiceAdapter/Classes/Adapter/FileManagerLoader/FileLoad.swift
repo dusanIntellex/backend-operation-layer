@@ -36,15 +36,12 @@ public class FileLoad: NSObject {
     @objc public dynamic var progress: CGFloat = 0.0
     public var fileId: String?
     public var path: URL?
-    @objc public dynamic var uploadedPath: String?
-    public var type: String?
+    public var dataFilename: String?
     public var mimeType: String?
     public var fileExtension: String?
     public var metaData: NSDictionary?
     public var size: NSInteger?
-    public var name: String?
-    public var data: Data?
-//    public var process: UploadRequest?
+    public var dataName: String?
     
     // MARK:- Constructor
     public override init() {
@@ -65,22 +62,12 @@ public class FileLoad: NSObject {
     
     convenience init(fileData: Data, fileId: String){
         self.init()
-        self.data = fileData
         self.fileId = fileId
     }
     
-    convenience init(path: URL, fileId: String, data: Data? = nil){
+    convenience init(path: URL, fileId: String){
         self.init()
         self.path = path
-        self.fileId = fileId
-        self.data = data
-    }
-    
-    convenience init(fileName: String, path: URL, fileExtension: String, fileId: String) {
-        self.init()
-        self.name = fileName
-        self.path = path
-        self.fileExtension = fileExtension
         self.fileId = fileId
     }
 }

@@ -220,7 +220,7 @@ class AlamofireExecutor: NSObject, ExecutorProtocol {
         backendRequest.printRequest()
         
         getSession(request: backendRequest).upload(multipartFormData: { (multipartFormData) in
-            multipartFormData.append(dataToUpload, withName: file.type ?? "image", fileName: "\(file.name ?? "image").\(file.fileExtension ?? "jpg")", mimeType: file.mimeType ?? "image/jpg")
+            multipartFormData.append(dataToUpload, withName: file.dataName ?? "image", fileName: "\(file.dataFilename ?? "image")", mimeType: file.mimeType ?? "image/jpg")
             
         }, usingThreshold: UInt64.init(), with: mainRequest!) { (result) in
             

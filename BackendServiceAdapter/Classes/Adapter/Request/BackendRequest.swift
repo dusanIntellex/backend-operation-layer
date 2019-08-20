@@ -38,18 +38,39 @@ public enum HttpMethod : String{
 }
 
 public class UploadFile : FileLoad{
-    public convenience init(fileId: String, data: Data, name: String, type: String, fileExtension: String){
-        self.init(fileData: data, fileId: fileId)
-        self.name = name
-        self.type = type
+    public convenience init(filePath: URL, fileId: String, dataName: String, dataFilename: String, fileExtension: String){
+        self.init(path: filePath, fileId: fileId)
+        self.dataName = dataName
+        self.dataFilename = dataFilename
         self.fileExtension = fileExtension
-        self.mimeType = "\(type)/\(fileExtension)"
+        self.mimeType = "\(dataName)/\(fileExtension)"
     }
 }
 
 public protocol UploadFileProtocol : class {
     var uploadFile: UploadFile! { get set }
-    init(fileId: String, data: Data, name: String, type: String, fileExtension: String)
+    
+    /// This init is required for upload protocol
+    ///
+    /// - Parameters:
+    ///   - fileId: Name of upload file
+    ///   - filePath: Path where file is read from
+    ///   - name: Key for sending data
+    ///   - type: Value for 
+    ///   - fileExtension: <#fileExtension description#>
+//    Content-Disposition: form-data; name=#{name}; filename=#{filename} (HTTP Header)
+//    Content-Type: #{mimeType} (HTTP Header)
+    
+    
+    /// Required init for upload file
+    ///
+    /// - Parameters:
+    ///   - fileId: Name of the file
+    ///   - filePath: URL where file is stored
+    ///   - dataName: <#dataName description#>
+    ///   - dataFilename: <#dataFilename description#>
+    ///   - fileExtension: <#fileExtension description#>
+    init(fileId: String, filePath: URL, dataName: String, dataFilename: String, fileExtension: String)
 }
 
 public protocol DownloadFileProtocol {
